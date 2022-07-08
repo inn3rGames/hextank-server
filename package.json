@@ -11,7 +11,7 @@
     "clean": "node node_modules/rimraf/bin lib",
     "test": "mocha --require ts-node/register test/**_test.ts --exit --timeout 15000"
   },
- "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/inn3rGames/hextank-server.git"
   },
@@ -39,6 +39,7 @@
     "@colyseus/monitor": "^0.14.20",
     "colyseus": "^0.14.20",
     "cors": "^2.8.5",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "express-basic-auth": "^1.2.1"
   }
 }
