@@ -1,6 +1,7 @@
 import Arena from "@colyseus/arena";
 import { monitor } from "@colyseus/monitor";
 import basicAuth from "express-basic-auth";
+import { matchMaker } from "colyseus";
 import WorldRoom from "./rooms/WorldRoom";
 
 export default Arena({
@@ -8,6 +9,7 @@ export default Arena({
 
     initializeGameServer: (gameServer) => {
         gameServer.define("world_room", WorldRoom);
+        matchMaker.createRoom("world_room", {});
     },
 
     initializeExpress: (app) => {

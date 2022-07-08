@@ -3,7 +3,8 @@ import WorldState from "./schema/WorldState";
 import HexTank from "./schema/HexTank";
 
 export default class WorldRoom extends Room<WorldState> {
-  maxClients: number = 25;
+  maxClients: number = 3;
+  autoDispose = false;
   worldSize: number = 200;
 
   onCreate(options: any) {
