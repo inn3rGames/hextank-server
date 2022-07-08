@@ -3,47 +3,56 @@ import WorldState from "./schema/WorldState";
 import HexTank from "./schema/HexTank";
 
 export default class WorldRoom extends Room<WorldState> {
-  maxClients: number = 3;
-  autoDispose = false;
-  worldSize: number = 200;
+    maxClients: number = 25;
+    autoDispose = false;
+    worldSize: number = 200;
 
-  onCreate(options: any) {
-    this.setState(new WorldState());
+    onCreate(options: any) {
+        this.setState(new WorldState());
 
-    this.onMessage("moveHexTank", (client, data) => {
-      const hexTank = this.state.hexTanks.get(client.sessionId);
-      hexTank.x = data.x;
-      hexTank.z = data.z;
-      console.log(`HexTank ${hexTank.id} moved to: `, JSON.stringify(data));
-    });
+        this.onMessage("moveHexTank", (client, data) => {
+            let currentHexTank = this.state.hexTanks.get(client.sessionId);
+            currentHexTank.x = data.x;
+            currentHexTank.z = data.z;
+            console.log(`HexTank ${currentHexTank.id} moved to: `, {
+                x: currentHexTank.x,
+                z: currentHexTank.z,
+            });
+        });
 
-    console.log(`WorldRoom ${this.roomId} created.`);
-  }
+        console.log(`WorldRoom ${this.roomId} created.`);
+    }
 
-  onJoin(client: Client, options: any) {
-    const hexTank = new HexTank(
-      this.generateCoordinate(),
-      this.generateCoordinate(),
-      client.sessionId
-    );
+    onJoin(client: Client, options: any) {
+        let currentHexTank = new HexTank(
+            this.generateCoordinate(),
+            this.generateCoordinate(),
+            client.sessionId
+        );
 
-    this.state.hexTanks.set(client.sessionId, hexTank);
+        this.state.hexTanks.set(client.sessionId, currentHexTank);
 
-    console.log(`HexTank ${hexTank.id} `, hexTank.toJSON(), "joined!");
-  }
+        console.log(`HexTank ${currentHexTank.id} joined at: `, {
+            x: currentHexTank.x,
+            z: currentHexTank.z,
+        });
+    }
 
-  onLeave(client: Client, consented: boolean) {
-    this.state.hexTanks.delete(client.sessionId);
-    console.log(client.sessionId, "left!");
-  }
+    onLeave(client: Client, consented: boolean) {
+        let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-  onDispose() {
-    console.log(`WorldRoom ${this.roomId} disposed.`);
-  }
+        console.log(`HexTank ${currentHexTank.id} left!`);
 
-  generateCoordinate(): number {
-    let min = -this.worldSize * 0.5;
-    let max = this.worldSize * 0.5;
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
+        this.state.hexTanks.delete(client.sessionId);
+    }
+
+    onDispose() {
+        console.log(`WorldRoom ${this.roomId} disposed.`);
+    }
+
+    generateCoordinate(): number {
+        let min = -this.worldSize * 0.5;
+        let max = this.worldSize * 0.5;
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
 }
