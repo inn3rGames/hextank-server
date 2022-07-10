@@ -5,7 +5,9 @@ import HexTank from "./schema/HexTank";
 export default class WorldRoom extends Room<WorldState> {
     maxClients: number = 25;
     autoDispose = false;
-    worldSize: number = 200;
+
+    private _worldSize: number = 200;
+    private _speed: number = 0.5;
 
     onCreate(options: any) {
         this.setState(new WorldState());
@@ -14,10 +16,35 @@ export default class WorldRoom extends Room<WorldState> {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
             currentHexTank.x = data.x;
             currentHexTank.z = data.z;
-            console.log(`HexTank ${currentHexTank.id} moved to: `, {
-                x: currentHexTank.x,
-                z: currentHexTank.z,
-            });
+            this._logMovement(currentHexTank);
+        });
+
+        this.onMessage("up", (client) => {
+            let currentHexTank = this.state.hexTanks.get(client.sessionId);
+            currentHexTank.z += this._speed;
+            currentHexTank.angle = 0;
+            this._logMovement(currentHexTank);
+        });
+
+        this.onMessage("down", (client) => {
+            let currentHexTank = this.state.hexTanks.get(client.sessionId);
+            currentHexTank.z -= this._speed;
+            currentHexTank.angle = Math.PI;
+            this._logMovement(currentHexTank);
+        });
+
+        this.onMessage("left", (client) => {
+            let currentHexTank = this.state.hexTanks.get(client.sessionId);
+            currentHexTank.x -= this._speed;
+            currentHexTank.angle = -Math.PI / 2;
+            this._logMovement(currentHexTank);
+        });
+
+        this.onMessage("right", (client) => {
+            let currentHexTank = this.state.hexTanks.get(client.sessionId);
+            currentHexTank.x += this._speed;
+            currentHexTank.angle = Math.PI / 2;
+            this._logMovement(currentHexTank);
         });
 
         console.log(`WorldRoom ${this.roomId} created.`);
@@ -25,8 +52,8 @@ export default class WorldRoom extends Room<WorldState> {
 
     onJoin(client: Client, options: any) {
         let currentHexTank = new HexTank(
-            this.generateCoordinate(),
-            this.generateCoordinate(),
+            this._generateCoordinate(),
+            this._generateCoordinate(),
             client.sessionId
         );
 
@@ -50,9 +77,17 @@ export default class WorldRoom extends Room<WorldState> {
         console.log(`WorldRoom ${this.roomId} disposed.`);
     }
 
-    generateCoordinate(): number {
-        let min = -this.worldSize * 0.5;
-        let max = this.worldSize * 0.5;
+    private _generateCoordinate(): number {
+        let min = -this._worldSize * 0.5;
+        let max = this._worldSize * 0.5;
         return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    private _logMovement(currentHexTank: HexTank) {
+        console.log(`HexTank ${currentHexTank.id} moved to: `, {
+            x: currentHexTank.x,
+            z: currentHexTank.z,
+            angle: currentHexTank.angle,
+        });
     }
 }

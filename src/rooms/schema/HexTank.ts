@@ -5,6 +5,8 @@ export default class HexTank extends Schema {
     @type("number") z: number;
     @type("string") id: string;
 
+    @type("number") angle: number = 0;
+
     constructor(x: number, z: number, id: string) {
         super();
 
