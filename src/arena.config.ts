@@ -5,7 +5,7 @@ import { matchMaker } from "colyseus";
 import WorldRoom from "./rooms/WorldRoom";
 
 export default Arena({
-    getId: () => "HexTank server",
+    getId: () => "HexTank Server",
 
     initializeGameServer: (gameServer) => {
         gameServer.define("world_room", WorldRoom);
@@ -14,7 +14,7 @@ export default Arena({
 
     initializeExpress: (app) => {
         app.get("/", (req, res) => {
-            res.send("HexTank server ready!");
+            res.send("HexTank Server ready!");
         });
 
         const basicAuthMiddleware = basicAuth({
