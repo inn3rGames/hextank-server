@@ -8,6 +8,7 @@ export default class WorldRoom extends Room<WorldState> {
 
     private _worldSize: number = 200;
     private _speed: number = 0.5;
+    private _rotationSpeed: number = 1 * (Math.PI / 180);
 
     onCreate(options: any) {
         this.setState(new WorldState());
@@ -35,13 +36,29 @@ export default class WorldRoom extends Room<WorldState> {
 
         this.onMessage("left", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            currentHexTank.angle -= 5 * (Math.PI / 180);
+
+            let computeAngle = currentHexTank.angle;
+            computeAngle -= this._rotationSpeed;
+            computeAngle = computeAngle % (2 * Math.PI);
+            if (computeAngle < 0) {
+                computeAngle += 2 * Math.PI;
+            }
+
+            currentHexTank.angle = computeAngle;
             this._logMovement(currentHexTank);
         });
 
         this.onMessage("right", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            currentHexTank.angle += 5 * (Math.PI / 180);
+
+            let computeAngle = currentHexTank.angle;
+            computeAngle += this._rotationSpeed;
+            computeAngle = computeAngle % (2 * Math.PI);
+            if (computeAngle < 0) {
+                computeAngle += 2 * Math.PI;
+            }
+
+            currentHexTank.angle = computeAngle;
             this._logMovement(currentHexTank);
         });
 
