@@ -8,7 +8,7 @@ export default class WorldRoom extends Room<WorldState> {
 
     private _worldSize: number = 200;
     private _speed: number = 0.5;
-    private _rotationSpeed: number = 1 * (Math.PI / 180);
+    private _rotationSpeed: number = 5 * (Math.PI / 180);
 
     onCreate(options: any) {
         this.setState(new WorldState());
@@ -37,28 +37,16 @@ export default class WorldRoom extends Room<WorldState> {
         this.onMessage("left", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            let computeAngle = currentHexTank.angle;
-            computeAngle -= this._rotationSpeed;
-            computeAngle = computeAngle % (2 * Math.PI);
-            if (computeAngle < 0) {
-                computeAngle += 2 * Math.PI;
-            }
+            currentHexTank.angle = this._computeAngle(currentHexTank.angle, -1);
 
-            currentHexTank.angle = computeAngle;
             this._logMovement(currentHexTank);
         });
 
         this.onMessage("right", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            let computeAngle = currentHexTank.angle;
-            computeAngle += this._rotationSpeed;
-            computeAngle = computeAngle % (2 * Math.PI);
-            if (computeAngle < 0) {
-                computeAngle += 2 * Math.PI;
-            }
+            currentHexTank.angle = this._computeAngle(currentHexTank.angle, 1);
 
-            currentHexTank.angle = computeAngle;
             this._logMovement(currentHexTank);
         });
 
@@ -96,6 +84,16 @@ export default class WorldRoom extends Room<WorldState> {
         let min = -this._worldSize * 0.5;
         let max = this._worldSize * 0.5;
         return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    private _computeAngle(angle: number, direction: number): number {
+        let computeAngle = angle;
+        computeAngle += this._rotationSpeed * direction;
+        computeAngle = computeAngle % (2 * Math.PI);
+        if (computeAngle < 0) {
+            computeAngle += 2 * Math.PI;
+        }
+        return computeAngle;
     }
 
     private _logMovement(currentHexTank: HexTank) {
