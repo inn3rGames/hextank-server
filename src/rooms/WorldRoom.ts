@@ -37,7 +37,7 @@ export default class WorldRoom extends Room<WorldState> {
         this.onMessage("left", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            currentHexTank.angle = this._computeAngle(currentHexTank.angle, -1);
+            currentHexTank.angle = this._positiveAngle(currentHexTank.angle, -1);
 
             this._logMovement(currentHexTank);
         });
@@ -45,7 +45,7 @@ export default class WorldRoom extends Room<WorldState> {
         this.onMessage("right", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            currentHexTank.angle = this._computeAngle(currentHexTank.angle, 1);
+            currentHexTank.angle = this._positiveAngle(currentHexTank.angle, 1);
 
             this._logMovement(currentHexTank);
         });
@@ -86,7 +86,7 @@ export default class WorldRoom extends Room<WorldState> {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    private _computeAngle(angle: number, direction: number): number {
+    private _positiveAngle(angle: number, direction: number): number {
         let computeAngle = angle;
         computeAngle += this._rotationSpeed * direction;
         computeAngle = computeAngle % (2 * Math.PI);
