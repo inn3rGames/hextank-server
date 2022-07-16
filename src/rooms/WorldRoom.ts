@@ -22,22 +22,25 @@ export default class WorldRoom extends Room<WorldState> {
 
         this.onMessage("up", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            currentHexTank.x -= this._speed * Math.cos(-currentHexTank.angle);
-            currentHexTank.z -= this._speed * Math.sin(-currentHexTank.angle);
+            currentHexTank.x -= this._speed * Math.cos(currentHexTank.angle);
+            currentHexTank.z -= this._speed * -Math.sin(currentHexTank.angle);
             this._logMovement(currentHexTank);
         });
 
         this.onMessage("down", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            currentHexTank.x += this._speed * Math.cos(-currentHexTank.angle);
-            currentHexTank.z += this._speed * Math.sin(-currentHexTank.angle);
+            currentHexTank.x += this._speed * Math.cos(currentHexTank.angle);
+            currentHexTank.z += this._speed * -Math.sin(currentHexTank.angle);
             this._logMovement(currentHexTank);
         });
 
         this.onMessage("left", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            currentHexTank.angle = this._positiveAngle(currentHexTank.angle, -1);
+            currentHexTank.angle = this._positiveAngle(
+                currentHexTank.angle,
+                -1
+            );
 
             this._logMovement(currentHexTank);
         });
