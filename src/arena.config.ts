@@ -10,6 +10,7 @@ export default Arena({
     initializeGameServer: (gameServer) => {
         gameServer.define("world_room", WorldRoom);
         matchMaker.createRoom("world_room", {});
+        gameServer.simulateLatency(200);
     },
 
     initializeExpress: (app) => {
