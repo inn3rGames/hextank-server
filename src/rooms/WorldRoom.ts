@@ -22,33 +22,28 @@ export default class WorldRoom extends Room<WorldState> {
 
         this.onMessage("up", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            currentHexTank.x -= this._speed * Math.cos(currentHexTank.angle);
-            currentHexTank.z -= this._speed * -Math.sin(currentHexTank.angle);
+            this._moveHexTank(currentHexTank, -1);
+            
             this._logMovement(currentHexTank);
         });
 
         this.onMessage("down", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            currentHexTank.x += this._speed * Math.cos(currentHexTank.angle);
-            currentHexTank.z += this._speed * -Math.sin(currentHexTank.angle);
+            this._moveHexTank(currentHexTank, 1);
+
             this._logMovement(currentHexTank);
         });
 
         this.onMessage("left", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-
-            currentHexTank.angle = this._positiveAngle(
-                currentHexTank.angle,
-                -1
-            );
+            this._rotateHexTank(currentHexTank, -1);
 
             this._logMovement(currentHexTank);
         });
 
         this.onMessage("right", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-
-            currentHexTank.angle = this._positiveAngle(currentHexTank.angle, 1);
+            this._rotateHexTank(currentHexTank, 1);
 
             this._logMovement(currentHexTank);
         });
@@ -89,14 +84,27 @@ export default class WorldRoom extends Room<WorldState> {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    private _positiveAngle(angle: number, direction: number): number {
+    private _positiveAngle(angle: number): number {
         let computeAngle = angle;
-        computeAngle += this._rotationSpeed * direction;
         computeAngle = computeAngle % (2 * Math.PI);
         if (computeAngle < 0) {
             computeAngle += 2 * Math.PI;
         }
         return computeAngle;
+    }
+
+    private _rotateHexTank(currentHexTank: HexTank, direction: number) {
+        let computeAngle = currentHexTank.angle;
+        computeAngle += this._rotationSpeed * direction;
+        computeAngle = this._positiveAngle(computeAngle);
+        currentHexTank.angle = computeAngle;
+    }
+
+    private _moveHexTank(currentHexTank: HexTank, direction: number) {
+        currentHexTank.x +=
+            this._speed * Math.cos(currentHexTank.angle) * direction;
+        currentHexTank.z +=
+            this._speed * -Math.sin(currentHexTank.angle) * direction;
     }
 
     private _logMovement(currentHexTank: HexTank) {
