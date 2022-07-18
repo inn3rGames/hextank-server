@@ -10,6 +10,11 @@ export default class WorldRoom extends Room<WorldState> {
     private _speed: number = 0.5;
     private _rotationSpeed: number = 5 * (Math.PI / 180);
 
+    private _fpsLimit: number = 60;
+    private _fixedFrameDuration: number = 1000 / this._fpsLimit;
+    private _elapsedTime: number = Math.round(this._fixedFrameDuration);
+    private _resetElapsedTime: boolean = true;
+
     onCreate(options: any) {
         this.setState(new WorldState());
 
@@ -23,7 +28,7 @@ export default class WorldRoom extends Room<WorldState> {
         this.onMessage("up", (client) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
             this._moveHexTank(currentHexTank, -1);
-            
+
             this._logMovement(currentHexTank);
         });
 
@@ -46,6 +51,10 @@ export default class WorldRoom extends Room<WorldState> {
             this._rotateHexTank(currentHexTank, 1);
 
             this._logMovement(currentHexTank);
+        });
+
+        this.setSimulationInterval((delta) => {
+            this._updateWorld(delta);
         });
 
         console.log(`WorldRoom ${this.roomId} created.`);
@@ -105,6 +114,25 @@ export default class WorldRoom extends Room<WorldState> {
             this._speed * Math.cos(currentHexTank.angle) * direction;
         currentHexTank.z +=
             this._speed * -Math.sin(currentHexTank.angle) * direction;
+    }
+
+    private _fixedUpdate() {}
+
+    private _updateWorld(delta: number) {
+        this._elapsedTime += delta;
+
+        if (
+            Math.abs(this._elapsedTime) >= 200 ||
+            this._resetElapsedTime === true
+        ) {
+            this._resetElapsedTime = false;
+            this._elapsedTime = Math.round(this._fixedFrameDuration);
+        }
+
+        while (this._elapsedTime >= this._fixedFrameDuration) {
+            this._elapsedTime -= this._fixedFrameDuration;
+            this._fixedUpdate();
+        }
     }
 
     private _logMovement(currentHexTank: HexTank) {
