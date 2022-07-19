@@ -15,7 +15,7 @@ export default class WorldRoom extends Room<WorldState> {
     private _elapsedTime: number = Math.round(this._fixedFrameDuration);
     private _resetElapsedTime: boolean = true;
 
-    private _commandsLimits = 10;
+    private _commandsPerFrame = 10;
 
     onCreate(options: any) {
         this.setState(new WorldState());
@@ -23,7 +23,7 @@ export default class WorldRoom extends Room<WorldState> {
         this.onMessage("command", (client, command) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            if (currentHexTank.commands.length < this._commandsLimits) {
+            if (currentHexTank.commands.length < this._commandsPerFrame) {
                 currentHexTank.commands.push(command);
             }
         });
