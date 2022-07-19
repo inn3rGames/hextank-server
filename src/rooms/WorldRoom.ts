@@ -15,42 +15,17 @@ export default class WorldRoom extends Room<WorldState> {
     private _elapsedTime: number = Math.round(this._fixedFrameDuration);
     private _resetElapsedTime: boolean = true;
 
+    private _commandsLimits = 10;
+
     onCreate(options: any) {
         this.setState(new WorldState());
 
-        this.onMessage("moveHexTank", (client, data) => {
+        this.onMessage("command", (client, command) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            currentHexTank.x = data.x;
-            currentHexTank.z = data.z;
-            this._logMovement(currentHexTank);
-        });
 
-        this.onMessage("up", (client) => {
-            let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            this._moveHexTank(currentHexTank, -1);
-
-            this._logMovement(currentHexTank);
-        });
-
-        this.onMessage("down", (client) => {
-            let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            this._moveHexTank(currentHexTank, 1);
-
-            this._logMovement(currentHexTank);
-        });
-
-        this.onMessage("left", (client) => {
-            let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            this._rotateHexTank(currentHexTank, -1);
-
-            this._logMovement(currentHexTank);
-        });
-
-        this.onMessage("right", (client) => {
-            let currentHexTank = this.state.hexTanks.get(client.sessionId);
-            this._rotateHexTank(currentHexTank, 1);
-
-            this._logMovement(currentHexTank);
+            if (currentHexTank.commands.length < this._commandsLimits) {
+                currentHexTank.commands.push(command);
+            }
         });
 
         this.setSimulationInterval((delta) => {
@@ -116,7 +91,35 @@ export default class WorldRoom extends Room<WorldState> {
             this._speed * -Math.sin(currentHexTank.angle) * direction;
     }
 
-    private _fixedUpdate() {}
+    private _fixedUpdate() {
+        this.state.hexTanks.forEach((currentHexTank) => {
+            let currentCommand;
+            while (
+                typeof (currentCommand = currentHexTank.commands.shift()) !==
+                "undefined"
+            ) {
+                if (currentCommand === "up") {
+                    this._moveHexTank(currentHexTank, -1);
+                    this._logMovement(currentHexTank);
+                }
+
+                if (currentCommand === "down") {
+                    this._moveHexTank(currentHexTank, 1);
+                    this._logMovement(currentHexTank);
+                }
+
+                if (currentCommand === "left") {
+                    this._rotateHexTank(currentHexTank, -1);
+                    this._logMovement(currentHexTank);
+                }
+
+                if (currentCommand === "right") {
+                    this._rotateHexTank(currentHexTank, 1);
+                    this._logMovement(currentHexTank);
+                }
+            }
+        });
+    }
 
     private _updateWorld(delta: number) {
         this._elapsedTime += delta;
