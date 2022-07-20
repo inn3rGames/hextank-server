@@ -68,29 +68,6 @@ export default class WorldRoom extends Room<WorldState> {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    private _positiveAngle(angle: number): number {
-        let computeAngle = angle;
-        computeAngle = computeAngle % (2 * Math.PI);
-        if (computeAngle < 0) {
-            computeAngle += 2 * Math.PI;
-        }
-        return computeAngle;
-    }
-
-    private _rotateHexTank(currentHexTank: HexTank, direction: number) {
-        let computeAngle = currentHexTank.angle;
-        computeAngle += this._rotationSpeed * direction;
-        computeAngle = this._positiveAngle(computeAngle);
-        currentHexTank.angle = computeAngle;
-    }
-
-    private _moveHexTank(currentHexTank: HexTank, direction: number) {
-        currentHexTank.x +=
-            this._speed * Math.cos(currentHexTank.angle) * direction;
-        currentHexTank.z +=
-            this._speed * -Math.sin(currentHexTank.angle) * direction;
-    }
-
     private _fixedUpdate() {
         this.state.hexTanks.forEach((currentHexTank) => {
             let currentCommand;
@@ -98,24 +75,34 @@ export default class WorldRoom extends Room<WorldState> {
                 typeof (currentCommand = currentHexTank.commands.shift()) !==
                 "undefined"
             ) {
-                if (currentCommand === "up") {
-                    this._moveHexTank(currentHexTank, -1);
-                    this._logMovement(currentHexTank);
+                if (currentCommand === "upKeyDown") {
+                    currentHexTank.move(-1);
                 }
 
-                if (currentCommand === "down") {
-                    this._moveHexTank(currentHexTank, 1);
-                    this._logMovement(currentHexTank);
+                if (currentCommand === "downKeyDown") {
+                    currentHexTank.move(1);
                 }
 
-                if (currentCommand === "left") {
-                    this._rotateHexTank(currentHexTank, -1);
-                    this._logMovement(currentHexTank);
+                if (currentCommand === "leftKeyDown") {
+                    currentHexTank.rotate(-1);
                 }
 
-                if (currentCommand === "right") {
-                    this._rotateHexTank(currentHexTank, 1);
-                    this._logMovement(currentHexTank);
+                if (currentCommand === "rightKeyDown") {
+                    currentHexTank.rotate(1);
+                }
+
+                if (currentCommand === "upKeyUp") {
+                }
+
+                if (currentCommand === "downKeyUp") {
+                }
+
+                if (currentCommand === "leftKeyUp") {
+                    currentHexTank.stopRotate();
+                }
+
+                if (currentCommand === "rightKeyUp") {
+                    currentHexTank.stopRotate();
                 }
             }
         });
