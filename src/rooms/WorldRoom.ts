@@ -104,6 +104,7 @@ export default class WorldRoom extends Room<WorldState> {
                 if (currentCommand === "rightKeyUp") {
                     currentHexTank.stopRotate();
                 }
+                this._logMovement(currentHexTank);
             }
         });
     }
