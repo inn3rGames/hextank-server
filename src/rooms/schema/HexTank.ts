@@ -11,7 +11,14 @@ export default class HexTank extends Schema {
     private _convertRadToDegrees: number = 180 / Math.PI;
     private _convertDegreesToRad: number = Math.PI / 180;
 
-    private _speed: number = 0.5;
+    private _speed: number = 0;
+    private _speedLimit: number = 1;
+    private _speedAcceralation: number =
+        1 * (this._speedLimit / this._fpsLimit);
+    private _speedDirection: number = 1;
+    private _speedDecelerate: boolean = false;
+    private _speedPreviousDirection: number = 0;
+
     private _rotationSpeed: number = 0;
     private _rotationSpeedLimit: number = 5 * this._convertDegreesToRad;
     private _rotationAcceralation =
@@ -53,7 +60,35 @@ export default class HexTank extends Schema {
     }
 
     move(direction: number) {
-        this.x += this._speed * Math.cos(this.angle) * direction;
-        this.z += this._speed * -Math.sin(this.angle) * direction;
+        this._speedDecelerate = false;
+
+        if (this._speedPreviousDirection !== direction) {
+            this._speed = 0;
+        }
+
+        this._speed += this._speedAcceralation;
+        if (this._speed > this._speedLimit) {
+            this._speed = this._speedLimit;
+        }
+
+        this._speedDirection = direction;
+        this._speedPreviousDirection = direction;
+    }
+
+    stopMove() {
+        this._speedDecelerate = true;
+    }
+
+    updateMovement() {
+        if (this._speedDecelerate === true) {
+            this._speed -= this._speedAcceralation;
+            if (this._speed <= 0) {
+                this._speed = 0;
+                this._speedDecelerate = false;
+            }
+        }
+
+        this.x += this._speed * Math.cos(this.angle) * this._speedDirection;
+        this.z += this._speed * -Math.sin(this.angle) * this._speedDirection;
     }
 }

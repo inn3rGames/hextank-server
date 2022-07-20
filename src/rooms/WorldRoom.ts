@@ -92,9 +92,11 @@ export default class WorldRoom extends Room<WorldState> {
                 }
 
                 if (currentCommand === "upKeyUp") {
+                    currentHexTank.stopMove();
                 }
 
                 if (currentCommand === "downKeyUp") {
+                    currentHexTank.stopMove();
                 }
 
                 if (currentCommand === "leftKeyUp") {
@@ -104,8 +106,9 @@ export default class WorldRoom extends Room<WorldState> {
                 if (currentCommand === "rightKeyUp") {
                     currentHexTank.stopRotate();
                 }
-                this._logMovement(currentHexTank);
             }
+            currentHexTank.updateMovement();
+            this._logMovement(currentHexTank);
         });
     }
 
