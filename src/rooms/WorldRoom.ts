@@ -23,7 +23,7 @@ export default class WorldRoom extends Room<WorldState> {
         this.onMessage("command", (client, command) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            if (currentHexTank.commands.length < this._commandsPerFrame) {
+            if (currentHexTank.commands.length < this._commandsPerFrame && typeof command === "string") {
                 currentHexTank.commands.push(command);
             }
         });
