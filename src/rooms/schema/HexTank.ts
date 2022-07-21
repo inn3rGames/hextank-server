@@ -15,9 +15,9 @@ export default class HexTank extends Schema {
     private _speedLimit: number = 1;
     private _speedAcceralation: number =
         1 * (this._speedLimit / this._fpsLimit);
-    private _speedDirection: number = 1;
-    private _speedDecelerate: boolean = false;
-    private _speedPreviousDirection: number = 0;
+
+    private _speedForward: boolean = false;
+    private _speedBackward: boolean = false;
 
     private _rotationSpeed: number = 0;
     private _rotationSpeedLimit: number = 5 * this._convertDegreesToRad;
@@ -42,7 +42,7 @@ export default class HexTank extends Schema {
         return computeAngle;
     }
 
-    rotate(direction: number) {
+    private _rotate(direction: number) {
         let computeAngle = this.angle;
 
         this._rotationSpeed += this._rotationAcceralation;
@@ -55,40 +55,116 @@ export default class HexTank extends Schema {
         this.angle = computeAngle;
     }
 
-    stopRotate() {
+    private _stopRotate() {
         this._rotationSpeed = 0;
     }
 
-    move(direction: number) {
-        this._speedDecelerate = false;
-
-        if (this._speedPreviousDirection !== direction) {
-            this._speed = 0;
-        }
-
-        this._speed += this._speedAcceralation;
-        if (this._speed > this._speedLimit) {
-            this._speed = this._speedLimit;
-        }
-
-        this._speedDirection = direction;
-        this._speedPreviousDirection = direction;
+    private _moveForward() {
+        this._speedForward = true;
     }
 
-    stopMove() {
-        this._speedDecelerate = true;
+    private _stopMoveForward() {
+        this._speedForward = false;
     }
 
-    updateMovement() {
-        if (this._speedDecelerate === true) {
-            this._speed -= this._speedAcceralation;
-            if (this._speed <= 0) {
-                this._speed = 0;
-                this._speedDecelerate = false;
+    private _moveBackward() {
+        this._speedBackward = true;
+    }
+
+    private _stopMoveBackward() {
+        this._speedBackward = false;
+    }
+
+    processCommands() {
+        let currentCommand;
+        while (
+            typeof (currentCommand = this.commands.shift()) !== "undefined"
+        ) {
+            if (currentCommand === "upKeyDown") {
+                this._moveForward();
+            }
+
+            if (currentCommand === "downKeyDown") {
+                this._moveBackward();
+            }
+
+            if (currentCommand === "leftKeyDown") {
+                this._rotate(-1);
+            }
+
+            if (currentCommand === "rightKeyDown") {
+                this._rotate(1);
+            }
+
+            if (currentCommand === "upKeyUp") {
+                this._stopMoveForward();
+            }
+
+            if (currentCommand === "downKeyUp") {
+                this._stopMoveBackward();
+            }
+
+            if (currentCommand === "leftKeyUp") {
+                this._stopRotate();
+            }
+
+            if (currentCommand === "rightKeyUp") {
+                this._stopRotate();
             }
         }
+    }
 
-        this.x += this._speed * Math.cos(this.angle) * this._speedDirection;
-        this.z += this._speed * -Math.sin(this.angle) * this._speedDirection;
+    private _decelerate() {
+        if (this._speedForward === false && this._speedBackward === false) {
+            if (this._speed !== 0) {
+                if (this._speed >= 0) {
+                    this._speed -= this._speedAcceralation;
+                    if (this._speed <= 0) {
+                        this._speed = 0;
+                    }
+                } else {
+                    this._speed += this._speedAcceralation;
+                    if (this._speed > 0) {
+                        this._speed = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    private _accelerate() {
+        if (this._speedForward === true) {
+            this._speed -= this._speedAcceralation;
+        }
+        if (this._speedBackward === true) {
+            this._speed += this._speedAcceralation;
+        }
+    }
+
+    private _limitTopSpeed() {
+        if (Math.abs(this._speed) > this._speedLimit) {
+            if (this._speed >= 0) {
+                this._speed = this._speedLimit;
+            } else {
+                this._speed = -this._speedLimit;
+            }
+        }
+    }
+
+    private _setNewPosition() {
+        this.x += this._speed * Math.cos(this.angle);
+        this.z += this._speed * -Math.sin(this.angle);
+    }
+
+    private _updateMovement() {
+        this._decelerate();
+        this._accelerate();
+        this._limitTopSpeed();
+        this._setNewPosition();
+    }
+
+    update() {
+        this.processCommands();
+        this._updateMovement();
     }
 }

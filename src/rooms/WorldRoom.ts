@@ -70,45 +70,7 @@ export default class WorldRoom extends Room<WorldState> {
 
     private _fixedUpdate() {
         this.state.hexTanks.forEach((currentHexTank) => {
-            let currentCommand;
-            while (
-                typeof (currentCommand = currentHexTank.commands.shift()) !==
-                "undefined"
-            ) {
-                if (currentCommand === "upKeyDown") {
-                    currentHexTank.move(-1);
-                }
-
-                if (currentCommand === "downKeyDown") {
-                    currentHexTank.move(1);
-                }
-
-                if (currentCommand === "leftKeyDown") {
-                    currentHexTank.rotate(-1);
-                }
-
-                if (currentCommand === "rightKeyDown") {
-                    currentHexTank.rotate(1);
-                }
-
-                if (currentCommand === "upKeyUp") {
-                    currentHexTank.stopMove();
-                }
-
-                if (currentCommand === "downKeyUp") {
-                    currentHexTank.stopMove();
-                }
-
-                if (currentCommand === "leftKeyUp") {
-                    currentHexTank.stopRotate();
-                }
-
-                if (currentCommand === "rightKeyUp") {
-                    currentHexTank.stopRotate();
-                }
-            }
-            currentHexTank.updateMovement();
-            this._logMovement(currentHexTank);
+            currentHexTank.update();
         });
     }
 
