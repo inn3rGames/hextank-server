@@ -7,8 +7,6 @@ export default class WorldRoom extends Room<WorldState> {
     autoDispose = false;
 
     private _worldSize: number = 200;
-    private _speed: number = 0.5;
-    private _rotationSpeed: number = 5 * (Math.PI / 180);
 
     private _fpsLimit: number = 60;
     private _fixedFrameDuration: number = 1000 / this._fpsLimit;
