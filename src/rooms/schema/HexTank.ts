@@ -12,7 +12,7 @@ export default class HexTank extends Schema {
     private _convertDegreesToRad: number = Math.PI / 180;
 
     private _speed: number = 0;
-    private _speedLimit: number = 1;
+    private _speedLimit: number = 0.5;
     private _speedAcceralation: number =
         1 * (this._speedLimit / this._fpsLimit);
 
@@ -20,9 +20,9 @@ export default class HexTank extends Schema {
     private _speedBackward: boolean = false;
 
     private _rotationSpeed: number = 0;
-    private _rotationSpeedLimit: number = 5 * this._convertDegreesToRad;
+    private _rotationSpeedLimit: number = 2.5 * this._convertDegreesToRad;
     private _rotationAcceralation =
-        (25 / this._fpsLimit) * this._convertDegreesToRad;
+        (6.25 / this._fpsLimit) * this._convertDegreesToRad;
 
     commands: Array<string> = [];
 

@@ -6,7 +6,7 @@ export default class WorldRoom extends Room<WorldState> {
     maxClients: number = 25;
     autoDispose = false;
 
-    private _worldSize: number = 200;
+    private _worldSize: number = 500;
 
     private _fpsLimit: number = 60;
     private _fixedFrameDuration: number = 1000 / this._fpsLimit;
