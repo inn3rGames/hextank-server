@@ -1,4 +1,4 @@
-import { Schema, type } from "@colyseus/schema";
+import { Schema, ArraySchema, type } from "@colyseus/schema";
 
 export default class HexTank extends Schema {
     @type("number") x: number;
@@ -6,6 +6,13 @@ export default class HexTank extends Schema {
     @type("string") id: string;
 
     @type("number") angle: number = 0;
+
+    @type("number") jetsRotationZ: number = 0;
+    @type("number") jetsRotationX: number = 0;
+    @type("number") jetsFlameScale: number = 0.11;
+
+    private _jetFlameScaleMax: number = 0.22;
+    private _jetFlameScaleMin: number = 0.11;
 
     private _fpsLimit: number = 60;
     private _convertRadToDegrees: number = 180 / Math.PI;
@@ -33,6 +40,7 @@ export default class HexTank extends Schema {
         this.z = z;
         this.id = id;
     }
+
     private _positiveAngle(angle: number): number {
         let computeAngle = angle;
         computeAngle = computeAngle % (2 * Math.PI);
@@ -53,26 +61,43 @@ export default class HexTank extends Schema {
         computeAngle += this._rotationSpeed * direction;
         computeAngle = this._positiveAngle(computeAngle);
         this.angle = computeAngle;
+
+        if (direction >= 0) {
+            this.jetsRotationX = -Math.PI / 12;
+        } else {
+            this.jetsRotationX = Math.PI / 12;
+        }
+        this.jetsFlameScale = this._jetFlameScaleMax;
     }
 
     private _stopRotate() {
         this._rotationSpeed = 0;
+        this.jetsRotationX = 0;
+        this.jetsFlameScale = this._jetFlameScaleMin;
     }
 
     private _moveForward() {
         this._speedForward = true;
+        this.jetsRotationZ = Math.PI / 12;
+        this.jetsFlameScale = this._jetFlameScaleMax;
     }
 
     private _stopMoveForward() {
         this._speedForward = false;
+        this.jetsRotationZ = 0;
+        this.jetsFlameScale = this._jetFlameScaleMin;
     }
 
     private _moveBackward() {
         this._speedBackward = true;
+        this.jetsRotationZ = -Math.PI / 12;
+        this.jetsFlameScale = this._jetFlameScaleMax;
     }
 
     private _stopMoveBackward() {
         this._speedBackward = false;
+        this.jetsRotationZ = 0;
+        this.jetsFlameScale = this._jetFlameScaleMin;
     }
 
     processCommands() {
