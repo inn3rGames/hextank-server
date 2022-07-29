@@ -76,10 +76,7 @@ export default class WorldRoom extends Room<WorldState> {
             this.state.hexTanks.forEach((nextHexTank) => {
                 if (currentHexTank.id !== nextHexTank.id) {
                     currentHexTank.collisionBody.collided =
-                        this.circleCollision(
-                            currentHexTank.collisionBody,
-                            nextHexTank.collisionBody
-                        );
+                        this.circleCollision(currentHexTank, nextHexTank);
                 }
             });
         });
@@ -102,13 +99,21 @@ export default class WorldRoom extends Room<WorldState> {
         }
     }
 
-    circleCollision(a: CollisionBody, b: CollisionBody) {
-        const dx = a.x + a.radius - (b.x + b.radius);
-        const dz = a.z + a.radius - (b.z + b.radius);
+    circleCollision(a: HexTank, b: HexTank) {
+        let distanceX =
+            a.x + a.collisionBody.radius - (b.x + b.collisionBody.radius);
+        let distanceZ =
+            a.z + a.collisionBody.radius - (b.z + b.collisionBody.radius);
 
-        const distance = Math.sqrt(dx * dx + dz * dz);
+        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
+        let radiiSum = a.collisionBody.radius + b.collisionBody.radius;
 
-        if (distance <= a.radius + b.radius) {
+        let unitX = distanceX / distance;
+        let unitZ = distanceZ / distance;
+
+        if (distance <= radiiSum) {
+            a.x = b.x + radiiSum * unitX;
+            a.z = b.z + radiiSum * unitZ;
             return true;
         } else {
             return false;
