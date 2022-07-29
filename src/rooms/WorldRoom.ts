@@ -1,6 +1,7 @@
 import { Room, Client } from "colyseus";
 import WorldState from "./schema/WorldState";
 import HexTank from "./schema/HexTank";
+import CollisionBody from "./schema/CollisionBody";
 
 export default class WorldRoom extends Room<WorldState> {
     maxClients: number = 25;
@@ -21,7 +22,10 @@ export default class WorldRoom extends Room<WorldState> {
         this.onMessage("command", (client, command) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-            if (currentHexTank.commands.length < this._commandsPerFrame && typeof command === "string") {
+            if (
+                currentHexTank.commands.length < this._commandsPerFrame &&
+                typeof command === "string"
+            ) {
                 currentHexTank.commands.push(command);
             }
         });
@@ -69,6 +73,15 @@ export default class WorldRoom extends Room<WorldState> {
     private _fixedUpdate() {
         this.state.hexTanks.forEach((currentHexTank) => {
             currentHexTank.update();
+            this.state.hexTanks.forEach((nextHexTank) => {
+                if (currentHexTank.id !== nextHexTank.id) {
+                    currentHexTank.collisionBody.collided =
+                        this.circleCollision(
+                            currentHexTank.collisionBody,
+                            nextHexTank.collisionBody
+                        );
+                }
+            });
         });
     }
 
@@ -86,6 +99,19 @@ export default class WorldRoom extends Room<WorldState> {
         while (this._elapsedTime >= this._fixedFrameDuration) {
             this._elapsedTime -= this._fixedFrameDuration;
             this._fixedUpdate();
+        }
+    }
+
+    circleCollision(a: CollisionBody, b: CollisionBody) {
+        const dx = a.x + a.radius - (b.x + b.radius);
+        const dz = a.z + a.radius - (b.z + b.radius);
+
+        const distance = Math.sqrt(dx * dx + dz * dz);
+
+        if (distance <= a.radius + b.radius) {
+            return true;
+        } else {
+            return false;
         }
     }
 

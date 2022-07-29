@@ -1,4 +1,5 @@
-import { Schema, ArraySchema, type } from "@colyseus/schema";
+import { Schema, type } from "@colyseus/schema";
+import CollisionBody from "./CollisionBody";
 
 export default class HexTank extends Schema {
     @type("number") x: number;
@@ -11,11 +12,12 @@ export default class HexTank extends Schema {
     @type("number") jetsRotationX: number = 0;
     @type("number") jetsFlameScale: number = 0.11;
 
+    @type(CollisionBody) collisionBody: CollisionBody;
+
     private _jetFlameScaleMax: number = 0.22;
     private _jetFlameScaleMin: number = 0.11;
 
     private _fpsLimit: number = 60;
-    private _convertRadToDegrees: number = 180 / Math.PI;
     private _convertDegreesToRad: number = Math.PI / 180;
 
     private _speed: number = 0;
@@ -39,6 +41,8 @@ export default class HexTank extends Schema {
         this.x = x;
         this.z = z;
         this.id = id;
+
+        this.collisionBody = new CollisionBody(this.x, this.z, 0.8);
     }
 
     private _positiveAngle(angle: number): number {
@@ -186,6 +190,7 @@ export default class HexTank extends Schema {
         this._accelerate();
         this._limitTopSpeed();
         this._setNewPosition();
+        this.collisionBody.updatePosition(this.x, this.z);
     }
 
     update() {
