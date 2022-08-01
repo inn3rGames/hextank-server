@@ -100,20 +100,17 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     circleCollision(a: HexTank, b: HexTank) {
-        let distanceX =
-            a.x + a.collisionBody.radius - (b.x + b.collisionBody.radius);
-        let distanceZ =
-            a.z + a.collisionBody.radius - (b.z + b.collisionBody.radius);
+        let distanceX = b.x - a.x;
+        let distanceZ = b.z - a.z;
 
         let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
         let radiiSum = a.collisionBody.radius + b.collisionBody.radius;
 
-        let unitX = distanceX / distance;
-        let unitZ = distanceZ / distance;
+        let angle = Math.atan2(distanceZ, distanceX);
 
         if (distance <= radiiSum) {
-            a.x = b.x + radiiSum * unitX;
-            a.z = b.z + radiiSum * unitZ;
+            a.x = b.x - (radiiSum + 0.01) * Math.cos(angle);
+            a.z = b.z - (radiiSum + 0.01) * Math.sin(angle);
             return true;
         } else {
             return false;
