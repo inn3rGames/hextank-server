@@ -1,3 +1,4 @@
+import {ColyseusTestServer} from "@colyseus/testing";
 import assert from "assert";
 import WorldRoom from "../src/rooms/WorldRoom";
 import HexTank from "../src/rooms/schema/HexTank";
@@ -36,12 +37,21 @@ describe("Testing backend logic", () => {
         assert.strictEqual(room.circleCollision(hexTank1!, hexTank2!), true);
     });
 
-    it("Circle bodies should not collide", () => {
-        let room = new WorldRoom();
+    it("Circle bodies should not collide", async () => {
+        let room = await ColyseusTestServer.createRoom();
+
+        console.log(room.state)
 
         let hexTank1 = new HexTank(100, 100, "1");
+        room.state.hexTanks.set(hexTank1.id, hexTank1);
+
         let hexTank2 = new HexTank(100, 100, "2");
+        room.state.hexTanks.set(hexTank2.id, hexTank2);
+
+        
+
         room.circleCollision(hexTank1!, hexTank2!);
+        room["_fixedUpdate"]();
 
         assert.strictEqual(room.circleCollision(hexTank1!, hexTank2!), false);
     });

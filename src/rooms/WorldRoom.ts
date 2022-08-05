@@ -85,21 +85,24 @@ export default class WorldRoom extends Room<WorldState> {
 
             this.state.hexTanks.forEach((nextHexTank) => {
                 if (currentHexTank.id !== nextHexTank.id) {
-                    currentHexTank.collisionBody.collided =
-                        this.circleCollision(currentHexTank, nextHexTank);
+                    if (this.circleCollision(currentHexTank, nextHexTank)) {
+                        currentHexTank.collisionBody.collided = true;
+                    }
                 }
             });
 
             this.state.staticEntities.forEach((staticEntity) => {
-                currentHexTank.collisionBody.collided = this.circleCollision(
-                    currentHexTank,
-                    staticEntity
-                );
-                if (currentHexTank.collisionBody.collided === true) {
-                    //this.state.staticEntities.delete(staticEntity.id);
-                    //console.log("deleted");
+                if (this.circleCollision(currentHexTank, staticEntity)) {
+                    currentHexTank.collisionBody.collided = true;
                 }
             });
+
+            if (currentHexTank.collisionBody.collisionPositions.length > 0) {
+                let newPosition =
+                    currentHexTank.collisionBody.getMaxCollisionPosition();
+                currentHexTank.x = newPosition.x;
+                currentHexTank.z = newPosition.z;
+            }
         });
     }
 
@@ -130,11 +133,12 @@ export default class WorldRoom extends Room<WorldState> {
         let angle = Math.atan2(distanceZ, distanceX);
 
         if (distance <= radiiSum) {
-            console.log(a.x, a.z, "start");
-            a.x = b.x - (radiiSum + 0.01) * Math.cos(angle);
-            a.z = b.z - (radiiSum + 0.01) * Math.sin(angle);
-            a.speed = 0;
-            console.log(a.x, a.z, "end");
+            let newPosition = {
+                x: b.x - (radiiSum + 0.01) * Math.cos(angle),
+                z: b.z - (radiiSum + 0.01) * Math.sin(angle),
+            };
+            a.collisionBody.collisionPositions.push(newPosition);
+
             return true;
         } else {
             return false;

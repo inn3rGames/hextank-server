@@ -187,17 +187,22 @@ export default class HexTank extends Schema {
         }
     }
 
+    private _updateCollisionBody() {
+        this.collisionBody.updatePosition(this.x, this.z);
+        this.collisionBody.collided = false;
+        this.collisionBody.collisionPositions.length = 0;
+    }
+
     private _updateMovement() {
         this._decelerate();
         this._accelerate();
         this._limitTopSpeed();
         this._setNewPosition();
-        this.collisionBody.updatePosition(this.x, this.z);
     }
 
     update() {
-        this.collisionBody.collided = false;
         this.processCommands();
         this._updateMovement();
+        this._updateCollisionBody();
     }
 }
