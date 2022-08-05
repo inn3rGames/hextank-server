@@ -37,7 +37,7 @@ describe("Testing backend logic", () => {
         assert.strictEqual(room.circleCollision(hexTank1!, hexTank2!), true);
     });
 
-    it("Circle bodies should not collide", async () => {
+    /* it("Circle bodies should not collide", async () => {
         let room = await ColyseusTestServer.createRoom();
 
         console.log(room.state)
@@ -54,5 +54,5 @@ describe("Testing backend logic", () => {
         room["_fixedUpdate"]();
 
         assert.strictEqual(room.circleCollision(hexTank1!, hexTank2!), false);
-    });
+    }); */
 });
