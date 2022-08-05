@@ -5,7 +5,7 @@ export default class CollisionBody extends Schema {
 
     x: number;
     z: number;
-    radius: number;
+    @type("number") radius: number;
 
     constructor(x: number, z: number, radius: number) {
         super();

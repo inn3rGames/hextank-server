@@ -20,7 +20,7 @@ export default class HexTank extends Schema {
     private _fpsLimit: number = 60;
     private _convertDegreesToRad: number = Math.PI / 180;
 
-    private _speed: number = 0;
+    speed: number = 0;
     private _speedLimit: number = 0.5;
     private _speedAcceralation: number =
         1 * (this._speedLimit / this._fpsLimit);
@@ -145,16 +145,16 @@ export default class HexTank extends Schema {
 
     private _decelerate() {
         if (this._speedForward === false && this._speedBackward === false) {
-            if (this._speed !== 0) {
-                if (this._speed >= 0) {
-                    this._speed -= this._speedAcceralation;
-                    if (this._speed <= 0) {
-                        this._speed = 0;
+            if (this.speed !== 0) {
+                if (this.speed >= 0) {
+                    this.speed -= this._speedAcceralation;
+                    if (this.speed <= 0) {
+                        this.speed = 0;
                     }
                 } else {
-                    this._speed += this._speedAcceralation;
-                    if (this._speed > 0) {
-                        this._speed = 0;
+                    this.speed += this._speedAcceralation;
+                    if (this.speed > 0) {
+                        this.speed = 0;
                     }
                 }
             }
@@ -163,26 +163,28 @@ export default class HexTank extends Schema {
 
     private _accelerate() {
         if (this._speedForward === true) {
-            this._speed -= this._speedAcceralation;
+            this.speed -= this._speedAcceralation;
         }
         if (this._speedBackward === true) {
-            this._speed += this._speedAcceralation;
+            this.speed += this._speedAcceralation;
         }
     }
 
     private _limitTopSpeed() {
-        if (Math.abs(this._speed) > this._speedLimit) {
-            if (this._speed >= 0) {
-                this._speed = this._speedLimit;
+        if (Math.abs(this.speed) > this._speedLimit) {
+            if (this.speed >= 0) {
+                this.speed = this._speedLimit;
             } else {
-                this._speed = -this._speedLimit;
+                this.speed = -this._speedLimit;
             }
         }
     }
 
     private _setNewPosition() {
-        this.x += this._speed * Math.cos(this.angle);
-        this.z += this._speed * -Math.sin(this.angle);
+        if (this.collisionBody.collided === false) {
+            this.x += this.speed * Math.cos(this.angle);
+            this.z += this.speed * -Math.sin(this.angle);
+        }
     }
 
     private _updateMovement() {
@@ -194,6 +196,7 @@ export default class HexTank extends Schema {
     }
 
     update() {
+        this.collisionBody.collided = false;
         this.processCommands();
         this._updateMovement();
     }

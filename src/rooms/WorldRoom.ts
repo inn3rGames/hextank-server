@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 import WorldState from "./schema/WorldState";
 import HexTank from "./schema/HexTank";
-import CollisionBody from "./schema/CollisionBody";
+import StaticEntity from "./schema/StaticEntity";
 
 export default class WorldRoom extends Room<WorldState> {
     maxClients: number = 25;
@@ -18,6 +18,15 @@ export default class WorldRoom extends Room<WorldState> {
 
     onCreate(options: any) {
         this.setState(new WorldState());
+
+        for (let i = 0; i < 50; i++) {
+            let staticEntity = new StaticEntity(
+                this._generateCoordinate(),
+                this._generateCoordinate(),
+                "jkl" + i
+            );
+            this.state.staticEntities.set(staticEntity.id, staticEntity);
+        }
 
         this.onMessage("command", (client, command) => {
             let currentHexTank = this.state.hexTanks.get(client.sessionId);
@@ -73,10 +82,22 @@ export default class WorldRoom extends Room<WorldState> {
     private _fixedUpdate() {
         this.state.hexTanks.forEach((currentHexTank) => {
             currentHexTank.update();
+
             this.state.hexTanks.forEach((nextHexTank) => {
                 if (currentHexTank.id !== nextHexTank.id) {
                     currentHexTank.collisionBody.collided =
                         this.circleCollision(currentHexTank, nextHexTank);
+                }
+            });
+
+            this.state.staticEntities.forEach((staticEntity) => {
+                currentHexTank.collisionBody.collided = this.circleCollision(
+                    currentHexTank,
+                    staticEntity
+                );
+                if (currentHexTank.collisionBody.collided === true) {
+                    //this.state.staticEntities.delete(staticEntity.id);
+                    //console.log("deleted");
                 }
             });
         });
@@ -99,7 +120,7 @@ export default class WorldRoom extends Room<WorldState> {
         }
     }
 
-    circleCollision(a: HexTank, b: HexTank) {
+    circleCollision(a: HexTank, b: HexTank | StaticEntity) {
         let distanceX = b.x - a.x;
         let distanceZ = b.z - a.z;
 
@@ -109,8 +130,11 @@ export default class WorldRoom extends Room<WorldState> {
         let angle = Math.atan2(distanceZ, distanceX);
 
         if (distance <= radiiSum) {
+            console.log(a.x, a.z, "start");
             a.x = b.x - (radiiSum + 0.01) * Math.cos(angle);
             a.z = b.z - (radiiSum + 0.01) * Math.sin(angle);
+            a.speed = 0;
+            console.log(a.x, a.z, "end");
             return true;
         } else {
             return false;
