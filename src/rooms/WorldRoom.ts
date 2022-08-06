@@ -59,7 +59,9 @@ export default class WorldRoom extends Room<WorldState> {
             this._updateWorld(delta);
         });
 
-        console.log(`WorldRoom ${this.roomId} created.`);
+        if (options.test !== true) {
+            console.log(`WorldRoom ${this.roomId} created.`);
+        }
     }
 
     onJoin(client: Client, options: any) {

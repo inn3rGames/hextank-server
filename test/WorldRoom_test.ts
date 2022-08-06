@@ -1,4 +1,3 @@
-import {ColyseusTestServer} from "@colyseus/testing";
 import assert from "assert";
 import WorldRoom from "../src/rooms/WorldRoom";
 import HexTank from "../src/rooms/schema/HexTank";
@@ -10,10 +9,7 @@ describe("Testing backend logic", () => {
         hexTank1["speed"] = 100;
         hexTank1["_updateMovement"]();
 
-        assert.strictEqual(
-            hexTank1["speed"] === hexTank1["_speedLimit"],
-            true
-        );
+        assert.strictEqual(hexTank1["speed"] === hexTank1["_speedLimit"], true);
     });
 
     it("Limit HexTank top rotation speed", () => {
@@ -34,13 +30,15 @@ describe("Testing backend logic", () => {
         let hexTank1 = new HexTank(100, 100, "1");
         let hexTank2 = new HexTank(100, 100, "2");
 
-        assert.strictEqual(room.circleCollision(hexTank1!, hexTank2!), true);
+        assert.strictEqual(
+            room.circleCircleCollision(hexTank1!, hexTank2!),
+            true
+        );
     });
 
-    /* it("Circle bodies should not collide", async () => {
-        let room = await ColyseusTestServer.createRoom();
-
-        console.log(room.state)
+    it("Circle bodies should not collide", async () => {
+        let room = new WorldRoom();
+        room.onCreate({test: true});
 
         let hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
@@ -48,11 +46,12 @@ describe("Testing backend logic", () => {
         let hexTank2 = new HexTank(100, 100, "2");
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
-        
-
-        room.circleCollision(hexTank1!, hexTank2!);
+        room.circleCircleCollision(hexTank1!, hexTank2!);
         room["_fixedUpdate"]();
 
-        assert.strictEqual(room.circleCollision(hexTank1!, hexTank2!), false);
-    }); */
+        assert.strictEqual(
+            room.circleCircleCollision(hexTank1!, hexTank2!),
+            false
+        );
+    });
 });
