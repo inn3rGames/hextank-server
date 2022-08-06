@@ -1,12 +1,12 @@
 import { Schema, type } from "@colyseus/schema";
-import CollisionBody from "./CollisionBody";
+import RectangleBody from "./RectangleBody";
 
-export default class StaticEntity extends Schema {
+export default class StaticRectangleEntity extends Schema {
     @type("number") x: number;
     @type("number") z: number;
     @type("string") id: string;
 
-    @type(CollisionBody) collisionBody: CollisionBody;
+    @type(RectangleBody) collisionBody: RectangleBody;
 
     constructor(x: number, z: number, id: string) {
         super();
@@ -15,6 +15,6 @@ export default class StaticEntity extends Schema {
         this.z = z;
         this.id = id;
 
-        this.collisionBody = new CollisionBody(this.x, this.z, 5);
+        this.collisionBody = new RectangleBody(this.x, this.z, 10, 5);
     }
 }

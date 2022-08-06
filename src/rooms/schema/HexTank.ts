@@ -1,5 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
-import CollisionBody from "./CollisionBody";
+import CircleBody from "./CircleBody";
 
 export default class HexTank extends Schema {
     @type("number") x: number;
@@ -12,7 +12,7 @@ export default class HexTank extends Schema {
     @type("number") jetsRotationX: number = 0;
     @type("number") jetsFlameScale: number = 0.11;
 
-    @type(CollisionBody) collisionBody: CollisionBody;
+    @type(CircleBody) collisionBody: CircleBody;
 
     private _jetFlameScaleMax: number = 0.22;
     private _jetFlameScaleMin: number = 0.11;
@@ -42,7 +42,7 @@ export default class HexTank extends Schema {
         this.z = z;
         this.id = id;
 
-        this.collisionBody = new CollisionBody(this.x, this.z, 0.8);
+        this.collisionBody = new CircleBody(this.x, this.z, 0.8);
     }
 
     private _positiveAngle(angle: number): number {

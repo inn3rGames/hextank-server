@@ -5,11 +5,13 @@ interface position {
     z: number;
 }
 
-export default class CollisionBody extends Schema {
+export default class CircleBody extends Schema {
     x: number;
     z: number;
+
     @type("number") radius: number;
     @type("boolean") collided: boolean = false;
+    @type("string") bodyType: string = "circle";
 
     collisionPositions: Array<position> = [{ x: 0, z: 0 }];
 
