@@ -7,6 +7,6 @@ export default class WorldState extends Schema {
     @type({ map: HexTank }) hexTanks = new MapSchema<HexTank>();
     @type({ map: StaticCircleEntity }) staticCircleEntities =
         new MapSchema<StaticCircleEntity>();
-    @type({ map: StaticRectangleEntity }) staticRectangleEntities =
+    @type({ map: StaticRectangleEntity}) staticRectangleEntities =
         new MapSchema<StaticRectangleEntity>();
 }

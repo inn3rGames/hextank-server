@@ -1,9 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
-
-interface position {
-    x: number;
-    z: number;
-}
+import Position from "./Interfaces";
 
 export default class CircleBody extends Schema {
     x: number;
@@ -11,9 +7,8 @@ export default class CircleBody extends Schema {
 
     @type("number") radius: number;
     @type("boolean") collided: boolean = false;
-    @type("string") bodyType: string = "circle";
 
-    collisionPositions: Array<position> = [{ x: 0, z: 0 }];
+    collisionPositions: Array<Position> = [{ x: 0, z: 0 }];
 
     constructor(x: number, z: number, radius: number) {
         super();
@@ -28,9 +23,13 @@ export default class CircleBody extends Schema {
         this.z = z;
     }
 
-    getMaxCollisionPosition(): position {
+    newCollisionResponse(response: Position) {
+        this.collisionPositions.push(response);
+    }
+
+    getCollisionResponse(): Position {
         let distances = [];
-        let positions = new Map<number, position>();
+        let positions = new Map<number, Position>();
 
         for (let i = 0; i < this.collisionPositions.length; i++) {
             let nextPosition = this.collisionPositions[i];
@@ -50,5 +49,11 @@ export default class CircleBody extends Schema {
         let maxPosition = positions.get(maxDistance);
 
         return maxPosition;
+    }
+
+    updateBody(x: number, z: number) {
+        this.updatePosition(x, z);
+        this.collided = false;
+        this.collisionPositions.length = 0;
     }
 }

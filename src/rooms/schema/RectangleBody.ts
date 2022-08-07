@@ -6,8 +6,6 @@ export default class RectangleBody extends Schema {
 
     @type("number") width: number;
     @type("number") height: number;
-    @type("boolean") collided: boolean = false;
-    @type("string") bodyType: string = "rectangle";
 
     constructor(x: number, z: number, width: number, height: number) {
         super();

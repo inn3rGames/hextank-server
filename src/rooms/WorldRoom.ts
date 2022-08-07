@@ -97,49 +97,139 @@ export default class WorldRoom extends Room<WorldState> {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
+    private _circleCircleCollision(
+        circleA: HexTank,
+        circleB: HexTank | StaticCircleEntity
+    ) {
+        let distanceX = circleB.x - circleA.x;
+        let distanceZ = circleB.z - circleA.z;
+
+        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
+        let radiiSum =
+            circleA.collisionBody.radius + circleB.collisionBody.radius;
+
+        let angle = Math.atan2(distanceZ, distanceX);
+
+        if (distance <= radiiSum) {
+            let newPosition = {
+                x: circleB.x - (radiiSum + 0.01) * Math.cos(angle),
+                z: circleB.z - (radiiSum + 0.01) * Math.sin(angle),
+            };
+            circleA.addCollisionResponse(newPosition);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private _clamp(min: number, currentValue: number, max: number): number {
+        return Math.min(Math.max(currentValue, min), max);
+    }
+
+    private _circleRectangleCollision(
+        circle: HexTank,
+        rectangle: StaticRectangleEntity
+    ) {
+        let closestPointX = this._clamp(
+            rectangle.x - rectangle.collisionBody.width * 0.5,
+            circle.x,
+            rectangle.x + rectangle.collisionBody.width * 0.5
+        );
+        let closestPointZ = this._clamp(
+            rectangle.z - rectangle.collisionBody.height * 0.5,
+            circle.z,
+            rectangle.z + rectangle.collisionBody.height * 0.5
+        );
+
+        let distanceX = closestPointX - circle.x;
+        let distanceZ = closestPointZ - circle.z;
+
+        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
+
+        let angle = Math.atan2(distanceZ, distanceX);
+
+        let depth = circle.collisionBody.radius - distance;
+
+        if (distance <= circle.collisionBody.radius) {
+            if (closestPointX === circle.x && closestPointZ === circle.z) {
+                if (circle.x > rectangle.x) {
+                    closestPointX =
+                        rectangle.x + rectangle.collisionBody.width * 0.5;
+                } else {
+                    closestPointX =
+                        rectangle.x - rectangle.collisionBody.width * 0.5;
+                }
+
+                if (circle.z > rectangle.z) {
+                    closestPointZ =
+                        rectangle.z + rectangle.collisionBody.height * 0.5;
+                } else {
+                    closestPointZ =
+                        rectangle.z - rectangle.collisionBody.height * 0.5;
+                }
+
+                distanceX = closestPointX - circle.x;
+                distanceZ = closestPointZ - circle.z;
+                distance = Math.sqrt(
+                    distanceX * distanceX + distanceZ * distanceZ
+                );
+                depth = circle.collisionBody.radius - distance;
+            }
+
+            let newPosition = {
+                x: circle.x - (depth + 0.01) * Math.cos(angle),
+                z: circle.z - (depth + 0.01) * Math.sin(angle),
+            };
+            circle.addCollisionResponse(newPosition);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private _checkHexTanksCollisions(currentHexTank: HexTank) {
+        this.state.hexTanks.forEach((nextHexTank) => {
+            if (currentHexTank.id !== nextHexTank.id) {
+                if (this._circleCircleCollision(currentHexTank, nextHexTank)) {
+                    currentHexTank.collisionBody.collided = true;
+                }
+            }
+        });
+    }
+    private _checkStaticCirclesCollisons(currentHexTank: HexTank) {
+        this.state.staticCircleEntities.forEach((staticCircleEntity) => {
+            if (
+                this._circleCircleCollision(currentHexTank, staticCircleEntity)
+            ) {
+                currentHexTank.collisionBody.collided = true;
+            }
+        });
+    }
+
+    private _checkStaticRectanglesCollisons(currentHexTank: HexTank) {
+        this.state.staticRectangleEntities.forEach((staticRectangleEntity) => {
+            if (
+                this._circleRectangleCollision(
+                    currentHexTank,
+                    staticRectangleEntity
+                )
+            ) {
+                currentHexTank.collisionBody.collided = true;
+            }
+        });
+    }
+
     private _fixedUpdate() {
         this.state.hexTanks.forEach((currentHexTank) => {
             currentHexTank.update();
 
-            this.state.hexTanks.forEach((nextHexTank) => {
-                if (currentHexTank.id !== nextHexTank.id) {
-                    if (
-                        this.circleCircleCollision(currentHexTank, nextHexTank)
-                    ) {
-                        currentHexTank.collisionBody.collided = true;
-                    }
-                }
-            });
+            this._checkHexTanksCollisions(currentHexTank);
+            this._checkStaticCirclesCollisons(currentHexTank);
+            this._checkStaticRectanglesCollisons(currentHexTank);
 
-            this.state.staticCircleEntities.forEach((staticCircleEntity) => {
-                if (
-                    this.circleCircleCollision(
-                        currentHexTank,
-                        staticCircleEntity
-                    )
-                ) {
-                    currentHexTank.collisionBody.collided = true;
-                }
-            });
-            if (currentHexTank.collisionBody.collisionPositions.length > 0) {
-                let newPosition =
-                    currentHexTank.collisionBody.getMaxCollisionPosition();
-                currentHexTank.x = newPosition.x;
-                currentHexTank.z = newPosition.z;
-            }
-
-            this.state.staticRectangleEntities.forEach(
-                (staticRectangleEntity) => {
-                    if (
-                        this.circleRectangleCollision(
-                            currentHexTank,
-                            staticRectangleEntity
-                        )
-                    ) {
-                        //currentHexTank.collisionBody.collided = true;
-                    }
-                }
-            );
+            currentHexTank.collisionResponse();
         });
     }
 
@@ -157,50 +247,6 @@ export default class WorldRoom extends Room<WorldState> {
         while (this._elapsedTime >= this._fixedFrameDuration) {
             this._elapsedTime -= this._fixedFrameDuration;
             this._fixedUpdate();
-        }
-    }
-
-    circleCircleCollision(a: HexTank, b: HexTank | StaticCircleEntity) {
-        let distanceX = b.x - a.x;
-        let distanceZ = b.z - a.z;
-
-        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
-        let radiiSum = a.collisionBody.radius + b.collisionBody.radius;
-
-        let angle = Math.atan2(distanceZ, distanceX);
-
-        if (distance <= radiiSum) {
-            let newPosition = {
-                x: b.x - (radiiSum + 0.01) * Math.cos(angle),
-                z: b.z - (radiiSum + 0.01) * Math.sin(angle),
-            };
-            a.collisionBody.collisionPositions.push(newPosition);
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    circleRectangleCollision(a: HexTank, b: StaticRectangleEntity) {
-        let distanceX = b.x - a.x;
-        let distanceZ = b.z - a.z;
-
-        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
-        let radiiSum = a.collisionBody.radius + b.collisionBody.width;
-
-        let angle = Math.atan2(distanceZ, distanceX);
-
-        if (distance <= radiiSum) {
-            /* let newPosition = {
-                x: b.x - (radiiSum + 0.01) * Math.cos(angle),
-                z: b.z - (radiiSum + 0.01) * Math.sin(angle),
-            };
-            a.collisionBody.collisionPositions.push(newPosition); */
-
-            return true;
-        } else {
-            return false;
         }
     }
 
