@@ -33,6 +33,8 @@ export default class HexTank extends Schema {
     private _rotationSpeedLimit: number = 2.5 * this._convertDegreesToRad;
     private _rotationAcceralation =
         (6.25 / this._fpsLimit) * this._convertDegreesToRad;
+    private _rotateLeft: boolean = false;
+    private _rotateRight: boolean = false;
 
     commands: Array<string> = [];
 
@@ -56,28 +58,37 @@ export default class HexTank extends Schema {
     }
 
     private _rotate(direction: number) {
-        let computeAngle = this.angle;
+        if (!(this._rotateLeft === true && this._rotateRight === true)) {
+            let computeAngle = this.angle;
 
-        this._rotationSpeed += this._rotationAcceralation;
-        if (this._rotationSpeed > this._rotationSpeedLimit) {
-            this._rotationSpeed = this._rotationSpeedLimit;
-        }
+            this._rotationSpeed += this._rotationAcceralation;
+            if (this._rotationSpeed > this._rotationSpeedLimit) {
+                this._rotationSpeed = this._rotationSpeedLimit;
+            }
 
-        computeAngle += this._rotationSpeed * direction;
-        computeAngle = this._positiveAngle(computeAngle);
-        this.angle = computeAngle;
+            computeAngle += this._rotationSpeed * direction;
+            computeAngle = this._positiveAngle(computeAngle);
+            this.angle = computeAngle;
 
-        if (direction >= 0) {
-            this.jetsRotationX = -Math.PI / 12;
+            if (direction >= 0) {
+                this.jetsRotationX = -Math.PI / 12;
+                this._rotateRight = true;
+            } else {
+                this.jetsRotationX = Math.PI / 12;
+                this._rotateLeft = true;
+            }
         } else {
-            this.jetsRotationX = Math.PI / 12;
+            this.jetsRotationX = 0;
         }
+
         this.jetsFlameScale = this._jetFlameScaleMax;
     }
 
     private _stopRotate() {
         this._rotationSpeed = 0;
         this.jetsRotationX = 0;
+        this._rotateLeft = false;
+        this._rotateRight = false;
         this.jetsFlameScale = this._jetFlameScaleMin;
     }
 
@@ -188,10 +199,18 @@ export default class HexTank extends Schema {
         }
     }
 
+    private _preventDoubleSpeedCommands() {
+        if (this._speedForward === true && this._speedBackward === true) {
+            this._speed = 0;
+            this.jetsRotationZ = 0;
+        }
+    }
+
     private _updateMovement() {
         this._decelerate();
         this._accelerate();
         this._limitTopSpeed();
+        this._preventDoubleSpeedCommands();
         this._setNewPosition();
     }
 
