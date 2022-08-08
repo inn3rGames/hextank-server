@@ -7,10 +7,10 @@ describe("Testing world room logic", () => {
     it("Limit HexTank top speed", () => {
         let hexTank1 = new HexTank(100, 100, "1");
 
-        hexTank1["speed"] = 100;
+        hexTank1["_speed"] = 100;
         hexTank1["_updateMovement"]();
 
-        assert.strictEqual(hexTank1["speed"] === hexTank1["_speedLimit"], true);
+        assert.strictEqual(hexTank1["_speed"] === hexTank1["_speedLimit"], true);
     });
 
     it("Limit HexTank top rotation speed", () => {
