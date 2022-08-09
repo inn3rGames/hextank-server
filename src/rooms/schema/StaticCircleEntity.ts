@@ -15,6 +15,6 @@ export default class StaticCircleEntity extends Schema {
         this.z = z;
         this.id = id;
 
-        this.collisionBody = new CircleBody(this.x, this.z, 5);
+        this.collisionBody = new CircleBody(this.x, this.z, 5, this);
     }
 }

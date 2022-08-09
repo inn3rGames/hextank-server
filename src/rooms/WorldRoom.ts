@@ -9,13 +9,43 @@ export default class WorldRoom extends Room<WorldState> {
     autoDispose = false;
 
     private _worldSize: number = 500;
+    private _cellSize: number = 100;
 
     private _fpsLimit: number = 60;
     private _fixedFrameDuration: number = 1000 / this._fpsLimit;
     private _elapsedTime: number = Math.round(this._fixedFrameDuration);
     private _resetElapsedTime: boolean = true;
 
-    private _commandsPerFrame = 10;
+    private _commandsPerFrame: number = 10;
+
+    private _spatialHash: Map<
+        string,
+        Array<HexTank | StaticCircleEntity | StaticRectangleEntity>
+    > = new Map();
+
+    private _generateKey(x: number, z: number): string {
+        let cellSize = 100;
+        return `${Math.floor(x / cellSize) * cellSize},${
+            Math.floor(z / cellSize) * cellSize
+        }`;
+    }
+
+    fillSpatialHash() {
+        let startX = -0.5 * this._worldSize;
+        let endX = 0.5 * this._worldSize;
+
+        let startZ = -0.5 * this._worldSize;
+        let endZ = 0.5 * this._worldSize;
+
+        let cellSize = 100;
+
+        for (let x = startX; x < endX; x += cellSize) {
+            for (let z = startZ; z < endZ; z += cellSize) {
+                let key = this._generateKey(x, z);
+                this._spatialHash.set(key, []);
+            }
+        }
+    }
 
     onCreate(options: any) {
         this.setState(new WorldState());
@@ -222,8 +252,11 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     private _fixedUpdate() {
+        this.fillSpatialHash();
         this.state.hexTanks.forEach((currentHexTank) => {
             currentHexTank.update();
+
+            currentHexTank.collisionBody.setSpatialHash(this._spatialHash);
 
             this._checkHexTanksCollisions(currentHexTank);
             this._checkStaticCirclesCollisons(currentHexTank);
@@ -231,6 +264,9 @@ export default class WorldRoom extends Room<WorldState> {
 
             currentHexTank.collisionResponse();
         });
+
+        console.log(this._spatialHash);
+        this._spatialHash.clear();
     }
 
     private _updateWorld(delta: number) {

@@ -15,6 +15,6 @@ export default class StaticRectangleEntity extends Schema {
         this.z = z;
         this.id = id;
 
-        this.collisionBody = new RectangleBody(this.x, this.z, 10, 10);
+        this.collisionBody = new RectangleBody(this.x, this.z, 10, 10, this);
     }
 }
