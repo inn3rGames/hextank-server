@@ -11,6 +11,8 @@ export default class RectangleBody extends Schema {
     @type("number") width: number;
     @type("number") height: number;
 
+    type: string = "rectangle";
+
     private _parent: StaticRectangleEntity;
 
     constructor(
@@ -99,6 +101,9 @@ export default class RectangleBody extends Schema {
         let keys = this.generateKeys();
 
         for (let i = 0; i < keys.length; i++) {
+            if (typeof spatialHash.get(keys[i]) === "undefined") {
+                spatialHash.set(keys[i], []);
+            }
             let newSpatialHashList = spatialHash.get(keys[i]);
             newSpatialHashList.push(this._parent);
             spatialHash.set(keys[i], newSpatialHashList);

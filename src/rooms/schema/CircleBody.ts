@@ -11,7 +11,10 @@ export default class CircleBody extends Schema {
     @type("number") radius: number;
     @type("boolean") collided: boolean = false;
 
+    type: string = "circle";
+
     collisionPositions: Array<Position> = [{ x: 0, z: 0 }];
+    keys: Array<string> = [];
 
     private _parent: HexTank | StaticCircleEntity;
 
@@ -124,12 +127,15 @@ export default class CircleBody extends Schema {
             Array<HexTank | StaticCircleEntity | StaticRectangleEntity>
         >
     ) {
-        let keys = this.generateKeys();
+        this.keys = this.generateKeys();
 
-        for (let i = 0; i < keys.length; i++) {
-            let newSpatialHashList = spatialHash.get(keys[i]);
+        for (let i = 0; i < this.keys.length; i++) {
+            if (typeof spatialHash.get(this.keys[i]) === "undefined") {
+                spatialHash.set(this.keys[i], []);
+            }
+            let newSpatialHashList = spatialHash.get(this.keys[i]);
             newSpatialHashList.push(this._parent);
-            spatialHash.set(keys[i], newSpatialHashList);
+            spatialHash.set(this.keys[i], newSpatialHashList);
         }
     }
 

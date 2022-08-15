@@ -9,7 +9,6 @@ export default class WorldRoom extends Room<WorldState> {
     autoDispose = false;
 
     private _worldSize: number = 500;
-    private _cellSize: number = 100;
 
     private _fpsLimit: number = 60;
     private _fixedFrameDuration: number = 1000 / this._fpsLimit;
@@ -23,28 +22,10 @@ export default class WorldRoom extends Room<WorldState> {
         Array<HexTank | StaticCircleEntity | StaticRectangleEntity>
     > = new Map();
 
-    private _generateKey(x: number, z: number): string {
-        let cellSize = 100;
-        return `${Math.floor(x / cellSize) * cellSize},${
-            Math.floor(z / cellSize) * cellSize
-        }`;
-    }
-
-    fillSpatialHash() {
-        let startX = -0.5 * this._worldSize;
-        let endX = 0.5 * this._worldSize;
-
-        let startZ = -0.5 * this._worldSize;
-        let endZ = 0.5 * this._worldSize;
-
-        let cellSize = 100;
-
-        for (let x = startX; x < endX; x += cellSize) {
-            for (let z = startZ; z < endZ; z += cellSize) {
-                let key = this._generateKey(x, z);
-                this._spatialHash.set(key, []);
-            }
-        }
+    private _generateCoordinate(): number {
+        let min = -this._worldSize * 0.5;
+        let max = this._worldSize * 0.5;
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     onCreate(options: any) {
@@ -119,12 +100,6 @@ export default class WorldRoom extends Room<WorldState> {
 
     onDispose() {
         console.log(`WorldRoom ${this.roomId} disposed.`);
-    }
-
-    private _generateCoordinate(): number {
-        let min = -this._worldSize * 0.5;
-        let max = this._worldSize * 0.5;
-        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     private _circleCircleCollision(
@@ -219,53 +194,76 @@ export default class WorldRoom extends Room<WorldState> {
         }
     }
 
-    private _checkHexTanksCollisions(currentHexTank: HexTank) {
-        this.state.hexTanks.forEach((nextHexTank) => {
-            if (currentHexTank.id !== nextHexTank.id) {
-                if (this._circleCircleCollision(currentHexTank, nextHexTank)) {
-                    currentHexTank.collisionBody.collided = true;
-                }
-            }
-        });
-    }
-    private _checkStaticCirclesCollisons(currentHexTank: HexTank) {
+    private _updateEntities() {
         this.state.staticCircleEntities.forEach((staticCircleEntity) => {
-            if (
-                this._circleCircleCollision(currentHexTank, staticCircleEntity)
-            ) {
-                currentHexTank.collisionBody.collided = true;
-            }
+            staticCircleEntity.collisionBody.setSpatialHash(this._spatialHash);
+        });
+
+        this.state.staticRectangleEntities.forEach((staticRectangleEntity) => {
+            staticRectangleEntity.collisionBody.setSpatialHash(
+                this._spatialHash
+            );
+        });
+
+        this.state.hexTanks.forEach((currentHexTank) => {
+            currentHexTank.update();
+            currentHexTank.collisionBody.setSpatialHash(this._spatialHash);
         });
     }
 
-    private _checkStaticRectanglesCollisons(currentHexTank: HexTank) {
-        this.state.staticRectangleEntities.forEach((staticRectangleEntity) => {
-            if (
-                this._circleRectangleCollision(
-                    currentHexTank,
-                    staticRectangleEntity
-                )
-            ) {
-                currentHexTank.collisionBody.collided = true;
+    private _checkCollisions() {
+        this.state.hexTanks.forEach((currentHexTank) => {
+            let currentKeys = currentHexTank.collisionBody.keys;
+
+            for (let i = 0; i < currentKeys.length; i++) {
+                let currentEntitiesList = this._spatialHash.get(currentKeys[i]);
+
+                if (typeof currentEntitiesList !== "undefined") {
+                    for (let j = 0; j < currentEntitiesList.length; j++) {
+                        let currentEntity = currentEntitiesList[j];
+                        if (currentEntity.id !== currentHexTank.id) {
+                            if (currentEntity.collisionBody.type === "circle") {
+                                currentEntity = currentEntity as
+                                    | HexTank
+                                    | StaticCircleEntity;
+                                if (
+                                    this._circleCircleCollision(
+                                        currentHexTank,
+                                        currentEntity
+                                    )
+                                ) {
+                                    currentHexTank.collisionBody.collided =
+                                        true;
+                                    currentHexTank.collisionResponse();
+                                }
+                            }
+
+                            if (
+                                currentEntity.collisionBody.type === "rectangle"
+                            ) {
+                                currentEntity =
+                                    currentEntity as StaticRectangleEntity;
+                                if (
+                                    this._circleRectangleCollision(
+                                        currentHexTank,
+                                        currentEntity
+                                    )
+                                ) {
+                                    currentHexTank.collisionBody.collided =
+                                        true;
+                                    currentHexTank.collisionResponse();
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
     }
 
     private _fixedUpdate() {
-        this.fillSpatialHash();
-        this.state.hexTanks.forEach((currentHexTank) => {
-            currentHexTank.update();
-
-            currentHexTank.collisionBody.setSpatialHash(this._spatialHash);
-
-            this._checkHexTanksCollisions(currentHexTank);
-            this._checkStaticCirclesCollisons(currentHexTank);
-            this._checkStaticRectanglesCollisons(currentHexTank);
-
-            currentHexTank.collisionResponse();
-        });
-
-        console.log(this._spatialHash);
+        this._updateEntities();
+        this._checkCollisions();
         this._spatialHash.clear();
     }
 

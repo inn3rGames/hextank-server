@@ -10,7 +10,10 @@ describe("Testing world room logic", () => {
         hexTank1["_speed"] = 100;
         hexTank1["_updateMovement"]();
 
-        assert.strictEqual(hexTank1["_speed"] === hexTank1["_speedLimit"], true);
+        assert.strictEqual(
+            hexTank1["_speed"] === hexTank1["_speedLimit"],
+            true
+        );
     });
 
     it("Limit HexTank top rotation speed", () => {
@@ -40,6 +43,8 @@ describe("Testing world room logic", () => {
     it("Circle bodies should not collide", async () => {
         let room = new WorldRoom();
         room.onCreate({ test: true });
+        room.state.staticCircleEntities.clear();
+        room.state.staticRectangleEntities.clear();
 
         let hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
@@ -74,6 +79,8 @@ describe("Testing world room logic", () => {
     it("Circle and rectangle bodies should not collide", () => {
         let room = new WorldRoom();
         room.onCreate({ test: true });
+        room.state.staticCircleEntities.clear();
+        room.state.staticRectangleEntities.clear();
 
         let hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
@@ -94,5 +101,40 @@ describe("Testing world room logic", () => {
             ),
             false
         );
+    });
+
+    it("Spatial hash should find collision", () => {
+        let room = new WorldRoom();
+        room.onCreate({ test: true });
+        room.state.staticCircleEntities.clear();
+        room.state.staticRectangleEntities.clear();
+
+        let hexTank1 = new HexTank(100, 100, "1");
+        room.state.hexTanks.set(hexTank1.id, hexTank1);
+
+        let hexTank2 = new HexTank(100, 100, "2");
+        room.state.hexTanks.set(hexTank2.id, hexTank2);
+
+        room["_fixedUpdate"]();
+
+        assert.strictEqual(hexTank1.collisionBody.collided, true);
+    });
+
+    it("Spatial hash should not find collision", () => {
+        let room = new WorldRoom();
+        room.onCreate({ test: true });
+        room.state.staticCircleEntities.clear();
+        room.state.staticRectangleEntities.clear();
+
+        let hexTank1 = new HexTank(100, 100, "1");
+        room.state.hexTanks.set(hexTank1.id, hexTank1);
+
+        let hexTank2 = new HexTank(100, 100, "2");
+        room.state.hexTanks.set(hexTank2.id, hexTank2);
+
+        room["_fixedUpdate"]();
+        room["_fixedUpdate"]();
+
+        assert.strictEqual(hexTank1.collisionBody.collided, false);
     });
 });
