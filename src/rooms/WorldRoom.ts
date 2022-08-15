@@ -116,11 +116,8 @@ export default class WorldRoom extends Room<WorldState> {
         let angle = Math.atan2(distanceZ, distanceX);
 
         if (distance <= radiiSum) {
-            let newPosition = {
-                x: circleB.x - (radiiSum + 0.01) * Math.cos(angle),
-                z: circleB.z - (radiiSum + 0.01) * Math.sin(angle),
-            };
-            circleA.addCollisionResponse(newPosition);
+            circleA.x = circleB.x - (radiiSum + 0.01) * Math.cos(angle);
+            circleA.z = circleB.z - (radiiSum + 0.01) * Math.sin(angle);
 
             return true;
         } else {
@@ -182,11 +179,8 @@ export default class WorldRoom extends Room<WorldState> {
                 depth = circle.collisionBody.radius - distance;
             }
 
-            let newPosition = {
-                x: circle.x - (depth + 0.01) * Math.cos(angle),
-                z: circle.z - (depth + 0.01) * Math.sin(angle),
-            };
-            circle.addCollisionResponse(newPosition);
+            circle.x = circle.x - (depth + 0.01) * Math.cos(angle);
+            circle.z = circle.z - (depth + 0.01) * Math.sin(angle);
 
             return true;
         } else {
@@ -234,7 +228,6 @@ export default class WorldRoom extends Room<WorldState> {
                                 ) {
                                     currentHexTank.collisionBody.collided =
                                         true;
-                                    currentHexTank.collisionResponse();
                                 }
                             }
 
@@ -251,7 +244,6 @@ export default class WorldRoom extends Room<WorldState> {
                                 ) {
                                     currentHexTank.collisionBody.collided =
                                         true;
-                                    currentHexTank.collisionResponse();
                                 }
                             }
                         }

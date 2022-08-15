@@ -1,6 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
 import CircleBody from "./CircleBody";
-import Position from "./Interfaces";
 
 export default class HexTank extends Schema {
     @type("number") x: number;
@@ -218,17 +217,5 @@ export default class HexTank extends Schema {
         this.processCommands();
         this._updateMovement();
         this.collisionBody.updateBody(this.x, this.z);
-    }
-
-    addCollisionResponse(response: Position) {
-        this.collisionBody.newCollisionResponse(response);
-    }
-
-    collisionResponse() {
-        if (this.collisionBody.collisionPositions.length > 0) {
-            let newPosition = this.collisionBody.getCollisionResponse();
-            this.x = newPosition.x;
-            this.z = newPosition.z;
-        }
     }
 }

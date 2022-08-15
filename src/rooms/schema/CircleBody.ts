@@ -13,7 +13,6 @@ export default class CircleBody extends Schema {
 
     type: string = "circle";
 
-    collisionPositions: Array<Position> = [{ x: 0, z: 0 }];
     keys: Array<string> = [];
 
     private _parent: HexTank | StaticCircleEntity;
@@ -38,33 +37,6 @@ export default class CircleBody extends Schema {
         this.z = z;
     }
 
-    newCollisionResponse(response: Position) {
-        this.collisionPositions.push(response);
-    }
-
-    getCollisionResponse(): Position {
-        let distances = [];
-        let positions = new Map<number, Position>();
-
-        for (let i = 0; i < this.collisionPositions.length; i++) {
-            let nextPosition = this.collisionPositions[i];
-
-            let distanceX = nextPosition.x - this.x;
-            let distanceZ = nextPosition.z - this.z;
-
-            let distance = Math.sqrt(
-                distanceX * distanceX + distanceZ * distanceZ
-            );
-
-            distances.push(distance);
-            positions.set(distance, nextPosition);
-        }
-
-        let maxDistance = Math.max(...distances);
-        let maxPosition = positions.get(maxDistance);
-
-        return maxPosition;
-    }
 
     private _generateKey(x: number, z: number): string {
         let cellSize = 100;
@@ -142,6 +114,5 @@ export default class CircleBody extends Schema {
     updateBody(x: number, z: number) {
         this.updatePosition(x, z);
         this.collided = false;
-        this.collisionPositions.length = 0;
     }
 }
