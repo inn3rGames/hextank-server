@@ -8,6 +8,8 @@ export default class StaticRectangleEntity extends Schema {
 
     @type(RectangleBody) collisionBody: RectangleBody;
 
+    entityType: string = "StaticRectangle";
+
     constructor(x: number, z: number, id: string) {
         super();
 

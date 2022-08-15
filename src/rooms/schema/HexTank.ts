@@ -14,6 +14,8 @@ export default class HexTank extends Schema {
 
     @type(CircleBody) collisionBody: CircleBody;
 
+    entityType: string = "HexTank";
+
     private _jetFlameScaleMax: number = 0.22;
     private _jetFlameScaleMin: number = 0.11;
 

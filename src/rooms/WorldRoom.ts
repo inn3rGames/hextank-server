@@ -116,8 +116,16 @@ export default class WorldRoom extends Room<WorldState> {
         let angle = Math.atan2(distanceZ, distanceX);
 
         if (distance <= radiiSum) {
+            let aX = circleA.x;
+            let aZ = circleA.z;
+
             circleA.x = circleB.x - (radiiSum + 0.01) * Math.cos(angle);
             circleA.z = circleB.z - (radiiSum + 0.01) * Math.sin(angle);
+
+            if (circleB.entityType === "HexTank") {
+                circleB.x = aX + (radiiSum + 0.01) * Math.cos(angle);
+                circleB.z = aZ + (radiiSum + 0.01) * Math.sin(angle);
+            }
 
             return true;
         } else {
@@ -228,6 +236,7 @@ export default class WorldRoom extends Room<WorldState> {
                                 ) {
                                     currentHexTank.collisionBody.collided =
                                         true;
+                                    currentEntity.collisionBody.collided = true;
                                 }
                             }
 

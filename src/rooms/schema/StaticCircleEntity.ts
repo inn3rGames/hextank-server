@@ -8,6 +8,8 @@ export default class StaticCircleEntity extends Schema {
 
     @type(CircleBody) collisionBody: CircleBody;
 
+    entityType: string = "StaticCircle";
+
     constructor(x: number, z: number, id: string) {
         super();
 
