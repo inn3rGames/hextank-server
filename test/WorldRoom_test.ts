@@ -5,7 +5,7 @@ import StaticRectangleEntity from "../src/rooms/schema/StaticRectangleEntity";
 
 describe("Testing world room logic", () => {
     it("Limit HexTank top speed", () => {
-        let hexTank1 = new HexTank(100, 100, "1");
+        const hexTank1 = new HexTank(100, 100, "1");
 
         hexTank1["_speed"] = 100;
         hexTank1["_updateMovement"]();
@@ -17,7 +17,7 @@ describe("Testing world room logic", () => {
     });
 
     it("Limit HexTank top rotation speed", () => {
-        let hexTank1 = new HexTank(100, 100, "1");
+        const hexTank1 = new HexTank(100, 100, "1");
 
         hexTank1["_rotationSpeed"] = 100;
         hexTank1["_rotate"](1);
@@ -29,10 +29,10 @@ describe("Testing world room logic", () => {
     });
 
     it("Circle bodies should collide", () => {
-        let room = new WorldRoom();
+        const room = new WorldRoom();
 
-        let hexTank1 = new HexTank(100, 100, "1");
-        let hexTank2 = new HexTank(100, 100, "2");
+        const hexTank1 = new HexTank(100, 100, "1");
+        const hexTank2 = new HexTank(100, 100, "2");
 
         assert.strictEqual(
             room["_circleCircleCollision"](hexTank1!, hexTank2!),
@@ -41,15 +41,15 @@ describe("Testing world room logic", () => {
     });
 
     it("Circle bodies should not collide", async () => {
-        let room = new WorldRoom();
+        const room = new WorldRoom();
         room.onCreate({ test: true });
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        let hexTank1 = new HexTank(100, 100, "1");
+        const hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        let hexTank2 = new HexTank(100, 100, "2");
+        const hexTank2 = new HexTank(100, 100, "2");
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
         room["_circleCircleCollision"](hexTank1!, hexTank2!);
@@ -62,10 +62,10 @@ describe("Testing world room logic", () => {
     });
 
     it("Circle and rectangle bodies should collide", () => {
-        let room = new WorldRoom();
+        const room = new WorldRoom();
 
-        let hexTank1 = new HexTank(100, 100, "1");
-        let staticRectangleEntity = new StaticRectangleEntity(100, 100, "2");
+        const hexTank1 = new HexTank(100, 100, "1");
+        const staticRectangleEntity = new StaticRectangleEntity(100, 100, "2");
 
         assert.strictEqual(
             room["_circleRectangleCollision"](
@@ -77,15 +77,15 @@ describe("Testing world room logic", () => {
     });
 
     it("Circle and rectangle bodies should not collide", () => {
-        let room = new WorldRoom();
+        const room = new WorldRoom();
         room.onCreate({ test: true });
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        let hexTank1 = new HexTank(100, 100, "1");
+        const hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        let staticRectangleEntity = new StaticRectangleEntity(100, 100, "2");
+        const staticRectangleEntity = new StaticRectangleEntity(100, 100, "2");
         room.state.staticRectangleEntities.set(
             staticRectangleEntity.id,
             staticRectangleEntity
@@ -104,15 +104,15 @@ describe("Testing world room logic", () => {
     });
 
     it("Spatial hash should find collision", () => {
-        let room = new WorldRoom();
+        const room = new WorldRoom();
         room.onCreate({ test: true });
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        let hexTank1 = new HexTank(100, 100, "1");
+        const hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        let hexTank2 = new HexTank(100, 100, "2");
+        const hexTank2 = new HexTank(100, 100, "2");
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
         room["_fixedUpdate"]();
@@ -121,15 +121,15 @@ describe("Testing world room logic", () => {
     });
 
     it("Spatial hash should not find collision", () => {
-        let room = new WorldRoom();
+        const room = new WorldRoom();
         room.onCreate({ test: true });
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        let hexTank1 = new HexTank(100, 100, "1");
+        const hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        let hexTank2 = new HexTank(100, 100, "2");
+        const hexTank2 = new HexTank(100, 100, "2");
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
         room["_fixedUpdate"]();

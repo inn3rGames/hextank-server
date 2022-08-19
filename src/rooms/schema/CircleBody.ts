@@ -37,45 +37,44 @@ export default class CircleBody extends Schema {
         this.z = z;
     }
 
-
     private _generateKey(x: number, z: number): string {
-        let cellSize = 100;
+        const cellSize = 100;
         return `${Math.floor(x / cellSize) * cellSize},${
             Math.floor(z / cellSize) * cellSize
         }`;
     }
 
     generateKeys(): Array<string> {
-        let width: number = this.radius;
+        const width: number = this.radius;
 
-        let topLeftCorner: Position = {
+        const topLeftCorner: Position = {
             x: this.x - width * 0.5,
             z: this.z - width * 0.5,
         };
-        let topRightCorner: Position = {
+        const topRightCorner: Position = {
             x: this.x + width * 0.5,
             z: this.z - width * 0.5,
         };
-        let bottomRightCorner: Position = {
+        const bottomRightCorner: Position = {
             x: this.x + width * 0.5,
             z: this.z + width * 0.5,
         };
-        let bottomLeftCorner: Position = {
+        const bottomLeftCorner: Position = {
             x: this.x - width * 0.5,
             z: this.z + width * 0.5,
         };
 
-        let rectangle: Array<Position> = [
+        const rectangle: Array<Position> = [
             topLeftCorner,
             topRightCorner,
             bottomRightCorner,
             bottomLeftCorner,
         ];
 
-        let keys: Array<string> = [];
+        const keys: Array<string> = [];
 
         for (let i = 0; i < rectangle.length; i++) {
-            let key = this._generateKey(rectangle[i].x, rectangle[i].z);
+            const key = this._generateKey(rectangle[i].x, rectangle[i].z);
 
             let duplicateKeys = 0;
 
@@ -105,7 +104,7 @@ export default class CircleBody extends Schema {
             if (typeof spatialHash.get(this.keys[i]) === "undefined") {
                 spatialHash.set(this.keys[i], []);
             }
-            let newSpatialHashList = spatialHash.get(this.keys[i]);
+            const newSpatialHashList = spatialHash.get(this.keys[i]);
             newSpatialHashList.push(this._parent);
             spatialHash.set(this.keys[i], newSpatialHashList);
         }

@@ -23,8 +23,8 @@ export default class WorldRoom extends Room<WorldState> {
     > = new Map();
 
     private _generateCoordinate(): number {
-        let min = -this._worldSize * 0.5;
-        let max = this._worldSize * 0.5;
+        const min = -this._worldSize * 0.5;
+        const max = this._worldSize * 0.5;
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
@@ -33,7 +33,7 @@ export default class WorldRoom extends Room<WorldState> {
 
         for (let i = 0; i < 50; i++) {
             if (Math.random() >= 0.5) {
-                let staticCircleEntity = new StaticCircleEntity(
+                const staticCircleEntity = new StaticCircleEntity(
                     this._generateCoordinate(),
                     this._generateCoordinate(),
                     "jkl" + i
@@ -43,7 +43,7 @@ export default class WorldRoom extends Room<WorldState> {
                     staticCircleEntity
                 );
             } else {
-                let staticRectangleEntity = new StaticRectangleEntity(
+                const staticRectangleEntity = new StaticRectangleEntity(
                     this._generateCoordinate(),
                     this._generateCoordinate(),
                     "jkl" + i
@@ -56,7 +56,7 @@ export default class WorldRoom extends Room<WorldState> {
         }
 
         this.onMessage("command", (client, command) => {
-            let currentHexTank = this.state.hexTanks.get(client.sessionId);
+            const currentHexTank = this.state.hexTanks.get(client.sessionId);
 
             if (
                 currentHexTank.commands.length < this._commandsPerFrame &&
@@ -76,7 +76,7 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     onJoin(client: Client, options: any) {
-        let currentHexTank = new HexTank(
+        const currentHexTank = new HexTank(
             this._generateCoordinate(),
             this._generateCoordinate(),
             client.sessionId
@@ -91,7 +91,7 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     onLeave(client: Client, consented: boolean) {
-        let currentHexTank = this.state.hexTanks.get(client.sessionId);
+        const currentHexTank = this.state.hexTanks.get(client.sessionId);
 
         console.log(`HexTank ${currentHexTank.id} left!`);
 
@@ -106,18 +106,20 @@ export default class WorldRoom extends Room<WorldState> {
         circleA: HexTank,
         circleB: HexTank | StaticCircleEntity
     ) {
-        let distanceX = circleB.x - circleA.x;
-        let distanceZ = circleB.z - circleA.z;
+        const distanceX = circleB.x - circleA.x;
+        const distanceZ = circleB.z - circleA.z;
 
-        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
-        let radiiSum =
+        const distance = Math.sqrt(
+            distanceX * distanceX + distanceZ * distanceZ
+        );
+        const radiiSum =
             circleA.collisionBody.radius + circleB.collisionBody.radius;
 
-        let angle = Math.atan2(distanceZ, distanceX);
+        const angle = Math.atan2(distanceZ, distanceX);
 
         if (distance <= radiiSum) {
-            let aX = circleA.x;
-            let aZ = circleA.z;
+            const aX = circleA.x;
+            const aZ = circleA.z;
 
             circleA.x = circleB.x - (radiiSum + 0.01) * Math.cos(angle);
             circleA.z = circleB.z - (radiiSum + 0.01) * Math.sin(angle);
@@ -155,9 +157,11 @@ export default class WorldRoom extends Room<WorldState> {
         let distanceX = closestPointX - circle.x;
         let distanceZ = closestPointZ - circle.z;
 
-        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
+        let distance = Math.sqrt(
+            distanceX * distanceX + distanceZ * distanceZ
+        );
 
-        let angle = Math.atan2(distanceZ, distanceX);
+        const angle = Math.atan2(distanceZ, distanceX);
 
         let depth = circle.collisionBody.radius - distance;
 
@@ -215,10 +219,12 @@ export default class WorldRoom extends Room<WorldState> {
 
     private _checkCollisions() {
         this.state.hexTanks.forEach((currentHexTank) => {
-            let currentKeys = currentHexTank.collisionBody.keys;
+            const currentKeys = currentHexTank.collisionBody.keys;
 
             for (let i = 0; i < currentKeys.length; i++) {
-                let currentEntitiesList = this._spatialHash.get(currentKeys[i]);
+                const currentEntitiesList = this._spatialHash.get(
+                    currentKeys[i]
+                );
 
                 if (typeof currentEntitiesList !== "undefined") {
                     for (let j = 0; j < currentEntitiesList.length; j++) {

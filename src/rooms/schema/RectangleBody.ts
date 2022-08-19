@@ -38,43 +38,43 @@ export default class RectangleBody extends Schema {
     }
 
     private _generateKey(x: number, z: number): string {
-        let cellSize = 100;
+        const cellSize = 100;
         return `${Math.floor(x / cellSize) * cellSize},${
             Math.floor(z / cellSize) * cellSize
         }`;
     }
 
     generateKeys(): Array<string> {
-        let width: number = Math.max(this.width, this.height);
+        const width: number = Math.max(this.width, this.height);
 
-        let topLeftCorner: Position = {
+        const topLeftCorner: Position = {
             x: this.x - width * 0.5,
             z: this.z - width * 0.5,
         };
-        let topRightCorner: Position = {
+        const topRightCorner: Position = {
             x: this.x + width * 0.5,
             z: this.z - width * 0.5,
         };
-        let bottomRightCorner: Position = {
+        const bottomRightCorner: Position = {
             x: this.x + width * 0.5,
             z: this.z + width * 0.5,
         };
-        let bottomLeftCorner: Position = {
+        const bottomLeftCorner: Position = {
             x: this.x - width * 0.5,
             z: this.z + width * 0.5,
         };
 
-        let rectangle: Array<Position> = [
+        const rectangle: Array<Position> = [
             topLeftCorner,
             topRightCorner,
             bottomRightCorner,
             bottomLeftCorner,
         ];
 
-        let keys: Array<string> = [];
+        const keys: Array<string> = [];
 
         for (let i = 0; i < rectangle.length; i++) {
-            let key = this._generateKey(rectangle[i].x, rectangle[i].z);
+            const key = this._generateKey(rectangle[i].x, rectangle[i].z);
 
             let duplicateKeys = 0;
 
@@ -98,13 +98,13 @@ export default class RectangleBody extends Schema {
             Array<HexTank | StaticCircleEntity | StaticRectangleEntity>
         >
     ) {
-        let keys = this.generateKeys();
+        const keys = this.generateKeys();
 
         for (let i = 0; i < keys.length; i++) {
             if (typeof spatialHash.get(keys[i]) === "undefined") {
                 spatialHash.set(keys[i], []);
             }
-            let newSpatialHashList = spatialHash.get(keys[i]);
+            const newSpatialHashList = spatialHash.get(keys[i]);
             newSpatialHashList.push(this._parent);
             spatialHash.set(keys[i], newSpatialHashList);
         }
