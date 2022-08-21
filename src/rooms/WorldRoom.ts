@@ -30,7 +30,7 @@ export default class WorldRoom extends Room<WorldState> {
 
     private _createMap() {
         const wallWidth = this._worldSize / 5;
-        const wallHeight = 5;
+        const wallHeight = 10;
         for (let i = 1; i <= 5; i++) {
             new StaticRectangleEntity(
                 -this._worldSize * 0.5 + i * wallWidth - wallWidth * 0.5,
