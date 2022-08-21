@@ -1,4 +1,4 @@
-import { Schema, type } from "@colyseus/schema";
+import { MapSchema, Schema, type } from "@colyseus/schema";
 import RectangleBody from "./RectangleBody";
 
 export default class StaticRectangleEntity extends Schema {
@@ -10,13 +10,30 @@ export default class StaticRectangleEntity extends Schema {
 
     entityType: string = "StaticRectangle";
 
-    constructor(x: number, z: number, id: string) {
+    constructor(
+        x: number,
+        z: number,
+        width: number,
+        height: number,
+        id: string,
+        group?: MapSchema<StaticRectangleEntity, string>
+    ) {
         super();
 
         this.x = x;
         this.z = z;
         this.id = id;
 
-        this.collisionBody = new RectangleBody(this.x, this.z, 10, 10, this);
+        this.collisionBody = new RectangleBody(
+            this.x,
+            this.z,
+            width,
+            height,
+            this
+        );
+
+        if (typeof group !== "undefined") {
+            group.set(this.id, this);
+        }
     }
 }

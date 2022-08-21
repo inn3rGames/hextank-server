@@ -65,7 +65,13 @@ describe("Testing world room logic", () => {
         const room = new WorldRoom();
 
         const hexTank1 = new HexTank(100, 100, "1");
-        const staticRectangleEntity = new StaticRectangleEntity(100, 100, "2");
+        const staticRectangleEntity = new StaticRectangleEntity(
+            100,
+            100,
+            10,
+            10,
+            "2"
+        );
 
         assert.strictEqual(
             room["_circleRectangleCollision"](
@@ -85,7 +91,13 @@ describe("Testing world room logic", () => {
         const hexTank1 = new HexTank(100, 100, "1");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        const staticRectangleEntity = new StaticRectangleEntity(100, 100, "2");
+        const staticRectangleEntity = new StaticRectangleEntity(
+            100,
+            100,
+            10,
+            10,
+            "2"
+        );
         room.state.staticRectangleEntities.set(
             staticRectangleEntity.id,
             staticRectangleEntity

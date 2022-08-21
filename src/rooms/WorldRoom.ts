@@ -28,32 +28,52 @@ export default class WorldRoom extends Room<WorldState> {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
+    private _createMap() {
+        const wallWidth = this._worldSize / 5;
+        const wallHeight = 5;
+        for (let i = 1; i <= 5; i++) {
+            new StaticRectangleEntity(
+                -this._worldSize * 0.5 + i * wallWidth - wallWidth * 0.5,
+                -this._worldSize * 0.5 - wallHeight * 0.5,
+                wallWidth,
+                wallHeight,
+                "wall1" + i,
+                this.state.staticRectangleEntities
+            );
+
+            new StaticRectangleEntity(
+                this._worldSize * 0.5 + wallHeight * 0.5,
+                -this._worldSize * 0.5 + i * wallWidth - wallWidth * 0.5,
+                wallHeight,
+                wallWidth,
+                "wall2" + i,
+                this.state.staticRectangleEntities
+            );
+
+            new StaticRectangleEntity(
+                this._worldSize * 0.5 - i * wallWidth + wallWidth * 0.5,
+                this._worldSize * 0.5 + wallHeight * 0.5,
+                wallWidth,
+                wallHeight,
+                "wall3" + i,
+                this.state.staticRectangleEntities
+            );
+
+            new StaticRectangleEntity(
+                -this._worldSize * 0.5 - wallHeight * 0.5,
+                this._worldSize * 0.5 - i * wallWidth + wallWidth * 0.5,
+                wallHeight,
+                wallWidth,
+                "wall4" + i,
+                this.state.staticRectangleEntities
+            );
+        }
+    }
+
     onCreate(options: any) {
         this.setState(new WorldState());
 
-        for (let i = 0; i < 50; i++) {
-            if (Math.random() >= 0.5) {
-                const staticCircleEntity = new StaticCircleEntity(
-                    this._generateCoordinate(),
-                    this._generateCoordinate(),
-                    "jkl" + i
-                );
-                this.state.staticCircleEntities.set(
-                    staticCircleEntity.id,
-                    staticCircleEntity
-                );
-            } else {
-                const staticRectangleEntity = new StaticRectangleEntity(
-                    this._generateCoordinate(),
-                    this._generateCoordinate(),
-                    "jkl" + i
-                );
-                this.state.staticRectangleEntities.set(
-                    staticRectangleEntity.id,
-                    staticRectangleEntity
-                );
-            }
-        }
+        this._createMap();
 
         this.onMessage("command", (client, command) => {
             const currentHexTank = this.state.hexTanks.get(client.sessionId);
@@ -157,9 +177,7 @@ export default class WorldRoom extends Room<WorldState> {
         let distanceX = closestPointX - circle.x;
         let distanceZ = closestPointZ - circle.z;
 
-        let distance = Math.sqrt(
-            distanceX * distanceX + distanceZ * distanceZ
-        );
+        let distance = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
 
         const angle = Math.atan2(distanceZ, distanceX);
 
