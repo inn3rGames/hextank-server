@@ -10,14 +10,14 @@ export default class HexTank extends Schema {
 
     @type("number") jetsRotationZ: number = 0;
     @type("number") jetsRotationX: number = 0;
-    @type("number") jetsFlameScale: number = 0.11;
+    @type("number") jetsFlameScale: number = -0.11;
 
     @type(CircleBody) collisionBody: CircleBody;
 
     entityType: string = "HexTank";
 
-    private _jetFlameScaleMax: number = 0.22;
-    private _jetFlameScaleMin: number = 0.11;
+    private _jetFlameScaleMax: number = -0.22;
+    private _jetFlameScaleMin: number = -0.11;
 
     private _fpsLimit: number = 60;
     private _convertDegreesToRad: number = Math.PI / 180;
@@ -72,10 +72,10 @@ export default class HexTank extends Schema {
             this.angle = computeAngle;
 
             if (direction >= 0) {
-                this.jetsRotationX = -Math.PI / 12;
+                this.jetsRotationX = Math.PI / 12;
                 this._rotateRight = true;
             } else {
-                this.jetsRotationX = Math.PI / 12;
+                this.jetsRotationX = -Math.PI / 12;
                 this._rotateLeft = true;
             }
         } else {
