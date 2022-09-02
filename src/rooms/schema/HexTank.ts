@@ -46,7 +46,7 @@ export default class HexTank extends Schema {
         this.z = z;
         this.id = id;
 
-        this.collisionBody = new CircleBody(this.x, this.z, 0.8, this);
+        this.collisionBody = new CircleBody(this.x, this.z, 0.7, this);
     }
 
     private _positiveAngle(angle: number): number {
