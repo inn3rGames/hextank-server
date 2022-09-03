@@ -70,7 +70,8 @@ describe("Testing world room logic", () => {
             100,
             10,
             10,
-            "2"
+            "2",
+            "wall"
         );
 
         assert.strictEqual(
@@ -96,7 +97,8 @@ describe("Testing world room logic", () => {
             100,
             10,
             10,
-            "2"
+            "2",
+            "wall"
         );
         room.state.staticRectangleEntities.set(
             staticRectangleEntity.id,

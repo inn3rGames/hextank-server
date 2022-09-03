@@ -8,6 +8,8 @@ export default class StaticRectangleEntity extends Schema {
 
     @type(RectangleBody) collisionBody: RectangleBody;
 
+    @type("string") modelType: string;
+
     entityType: string = "StaticRectangle";
 
     constructor(
@@ -16,6 +18,7 @@ export default class StaticRectangleEntity extends Schema {
         width: number,
         height: number,
         id: string,
+        modelType: string,
         group?: MapSchema<StaticRectangleEntity, string>
     ) {
         super();
@@ -31,6 +34,8 @@ export default class StaticRectangleEntity extends Schema {
             height,
             this
         );
+
+        this.modelType = modelType;
 
         if (typeof group !== "undefined") {
             group.set(this.id, this);

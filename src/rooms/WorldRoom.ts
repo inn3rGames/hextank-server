@@ -38,6 +38,7 @@ export default class WorldRoom extends Room<WorldState> {
                 wallWidth,
                 wallHeight,
                 "wall1" + i,
+                "wall",
                 this.state.staticRectangleEntities
             );
 
@@ -47,6 +48,7 @@ export default class WorldRoom extends Room<WorldState> {
                 wallHeight,
                 wallWidth,
                 "wall2" + i,
+                "wall",
                 this.state.staticRectangleEntities
             );
 
@@ -56,6 +58,7 @@ export default class WorldRoom extends Room<WorldState> {
                 wallWidth,
                 wallHeight,
                 "wall3" + i,
+                "wall",
                 this.state.staticRectangleEntities
             );
 
@@ -65,9 +68,40 @@ export default class WorldRoom extends Room<WorldState> {
                 wallHeight,
                 wallWidth,
                 "wall4" + i,
+                "wall",
                 this.state.staticRectangleEntities
             );
         }
+
+        new StaticRectangleEntity(
+            0,
+            Math.sqrt(3) * 32 * 0.5,
+            50,
+            50,
+            "pyramid1",
+            "pyramid",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            32,
+            -Math.sqrt(3) * 32 * 0.5,
+            50,
+            50,
+            "pyramid2",
+            "pyramid",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -32,
+            -Math.sqrt(3) * 32 * 0.5,
+            50,
+            50,
+            "pyramid3",
+            "pyramid",
+            this.state.staticRectangleEntities
+        );
     }
 
     onCreate(options: any) {
