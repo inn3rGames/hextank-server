@@ -102,6 +102,15 @@ export default class WorldRoom extends Room<WorldState> {
             "pyramid",
             this.state.staticRectangleEntities
         );
+
+        new StaticCircleEntity(
+            -150,
+            -150,
+            45,
+            "oasis1",
+            "oasis",
+            this.state.staticCircleEntities
+        );
     }
 
     onCreate(options: any) {
