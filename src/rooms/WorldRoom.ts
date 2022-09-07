@@ -111,6 +111,16 @@ export default class WorldRoom extends Room<WorldState> {
             "oasis",
             this.state.staticCircleEntities
         );
+
+        new StaticRectangleEntity(
+            150,
+            150,
+            16.5,
+            8.5,
+            "building1",
+            "building1",
+            this.state.staticRectangleEntities
+        );
     }
 
     onCreate(options: any) {
