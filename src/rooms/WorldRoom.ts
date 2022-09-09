@@ -104,8 +104,8 @@ export default class WorldRoom extends Room<WorldState> {
         );
 
         new StaticCircleEntity(
-            -150,
-            -150,
+            0,
+            -110,
             45,
             "oasis1",
             "oasis",

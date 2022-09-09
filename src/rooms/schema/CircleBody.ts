@@ -45,23 +45,23 @@ export default class CircleBody extends Schema {
     }
 
     generateKeys(): Array<string> {
-        const width: number = this.radius;
+        const diameter: number = 2 * this.radius;
 
         const topLeftCorner: Position = {
-            x: this.x - width * 0.5,
-            z: this.z - width * 0.5,
+            x: this.x - diameter * 0.5,
+            z: this.z - diameter * 0.5,
         };
         const topRightCorner: Position = {
-            x: this.x + width * 0.5,
-            z: this.z - width * 0.5,
+            x: this.x + diameter * 0.5,
+            z: this.z - diameter * 0.5,
         };
         const bottomRightCorner: Position = {
-            x: this.x + width * 0.5,
-            z: this.z + width * 0.5,
+            x: this.x + diameter * 0.5,
+            z: this.z + diameter * 0.5,
         };
         const bottomLeftCorner: Position = {
-            x: this.x - width * 0.5,
-            z: this.z + width * 0.5,
+            x: this.x - diameter * 0.5,
+            z: this.z + diameter * 0.5,
         };
 
         const rectangle: Array<Position> = [
