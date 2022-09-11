@@ -29,14 +29,16 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     private _createMap() {
+        const collisionBodyOffset = 1.03;
+
         const wallWidth = this._worldSize / 5;
         const wallHeight = 10;
         for (let i = 1; i <= 5; i++) {
             new StaticRectangleEntity(
                 -this._worldSize * 0.5 + i * wallWidth - wallWidth * 0.5,
                 -this._worldSize * 0.5 - wallHeight * 0.5,
-                wallWidth,
-                wallHeight,
+                wallWidth * collisionBodyOffset,
+                wallHeight * collisionBodyOffset,
                 "wall1" + i,
                 "wall",
                 this.state.staticRectangleEntities
@@ -45,8 +47,8 @@ export default class WorldRoom extends Room<WorldState> {
             new StaticRectangleEntity(
                 this._worldSize * 0.5 + wallHeight * 0.5,
                 -this._worldSize * 0.5 + i * wallWidth - wallWidth * 0.5,
-                wallHeight,
-                wallWidth,
+                wallHeight * collisionBodyOffset,
+                wallWidth * collisionBodyOffset,
                 "wall2" + i,
                 "wall",
                 this.state.staticRectangleEntities
@@ -55,8 +57,8 @@ export default class WorldRoom extends Room<WorldState> {
             new StaticRectangleEntity(
                 this._worldSize * 0.5 - i * wallWidth + wallWidth * 0.5,
                 this._worldSize * 0.5 + wallHeight * 0.5,
-                wallWidth,
-                wallHeight,
+                wallWidth * collisionBodyOffset,
+                wallHeight * collisionBodyOffset,
                 "wall3" + i,
                 "wall",
                 this.state.staticRectangleEntities
@@ -65,8 +67,8 @@ export default class WorldRoom extends Room<WorldState> {
             new StaticRectangleEntity(
                 -this._worldSize * 0.5 - wallHeight * 0.5,
                 this._worldSize * 0.5 - i * wallWidth + wallWidth * 0.5,
-                wallHeight,
-                wallWidth,
+                wallHeight * collisionBodyOffset,
+                wallWidth * collisionBodyOffset,
                 "wall4" + i,
                 "wall",
                 this.state.staticRectangleEntities
@@ -76,8 +78,8 @@ export default class WorldRoom extends Room<WorldState> {
         new StaticRectangleEntity(
             0,
             Math.sqrt(3) * 32 * 0.5,
-            50,
-            50,
+            50 * collisionBodyOffset,
+            50 * collisionBodyOffset,
             "pyramid1",
             "pyramid",
             this.state.staticRectangleEntities
@@ -86,8 +88,8 @@ export default class WorldRoom extends Room<WorldState> {
         new StaticRectangleEntity(
             32,
             -Math.sqrt(3) * 32 * 0.5,
-            50,
-            50,
+            50 * collisionBodyOffset,
+            50 * collisionBodyOffset,
             "pyramid2",
             "pyramid",
             this.state.staticRectangleEntities
@@ -96,8 +98,8 @@ export default class WorldRoom extends Room<WorldState> {
         new StaticRectangleEntity(
             -32,
             -Math.sqrt(3) * 32 * 0.5,
-            50,
-            50,
+            50 * collisionBodyOffset,
+            50 * collisionBodyOffset,
             "pyramid3",
             "pyramid",
             this.state.staticRectangleEntities
@@ -106,18 +108,318 @@ export default class WorldRoom extends Room<WorldState> {
         new StaticCircleEntity(
             0,
             -110,
-            45,
+            43.75 * collisionBodyOffset,
             "oasis1",
             "oasis",
             this.state.staticCircleEntities
         );
 
         new StaticRectangleEntity(
+            0,
             150,
-            150,
-            16.5,
-            8.5,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
             "building1",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -25,
+            150,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building2",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            25,
+            150,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building3",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -50,
+            150,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building4",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            50,
+            150,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building5",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -75,
+            150,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building6",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            75,
+            150,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building7",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            0,
+            110,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building8",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -25,
+            110,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building9",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            25,
+            110,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building10",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -50,
+            110,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building11",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            50,
+            110,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building12",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -75,
+            110,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building13",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            75,
+            110,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building14",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            0,
+            190,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building15",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -25,
+            190,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building16",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            25,
+            190,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building17",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -50,
+            190,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building18",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            50,
+            190,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building19",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -75,
+            190,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building20",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            75,
+            190,
+            20 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building21",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            0,
+            130,
+            12 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building22",
+            "building2",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            0,
+            170,
+            12 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building23",
+            "building2",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            50,
+            130,
+            12 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building24",
+            "building2",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            50,
+            170,
+            12 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building25",
+            "building2",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -50,
+            130,
+            12 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building26",
+            "building2",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -50,
+            170,
+            12 * collisionBodyOffset,
+            12 * collisionBodyOffset,
+            "building27",
+            "building2",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            75,
+            130,
+            12 * collisionBodyOffset,
+            20 * collisionBodyOffset,
+            "building28",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            75,
+            170,
+            12 * collisionBodyOffset,
+            20 * collisionBodyOffset,
+            "building29",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -75,
+            130,
+            12 * collisionBodyOffset,
+            20 * collisionBodyOffset,
+            "building30",
+            "building1",
+            this.state.staticRectangleEntities
+        );
+
+        new StaticRectangleEntity(
+            -75,
+            170,
+            12 * collisionBodyOffset,
+            20 * collisionBodyOffset,
+            "building31",
             "building1",
             this.state.staticRectangleEntities
         );
