@@ -25,8 +25,7 @@ export default class WorldRoom extends Room<WorldState> {
     private _generateCoordinate(): number {
         const min = -this._worldSize * 0.5;
         const max = this._worldSize * 0.5;
-        //return Math.floor(Math.random() * (max - min + 1) + min);
-        return 0;
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     private _createMap() {
