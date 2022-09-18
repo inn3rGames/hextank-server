@@ -25,7 +25,8 @@ export default class WorldRoom extends Room<WorldState> {
     private _generateCoordinate(): number {
         const min = -this._worldSize * 0.5;
         const max = this._worldSize * 0.5;
-        return Math.floor(Math.random() * (max - min + 1) + min);
+        //return Math.floor(Math.random() * (max - min + 1) + min);
+        return 0;
     }
 
     private _createMap() {
@@ -422,6 +423,222 @@ export default class WorldRoom extends Room<WorldState> {
             "building31",
             "building1",
             this.state.staticRectangleEntities
+        );
+
+        new StaticCircleEntity(
+            -150,
+            -100,
+            12.25 * collisionBodyOffset,
+            "rock1",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -140,
+            -90,
+            12.25 * collisionBodyOffset,
+            "rock2",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -160,
+            -100,
+            12.25 * collisionBodyOffset,
+            "rock3",
+            "rock3",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -100,
+            -210,
+            12.25 * collisionBodyOffset,
+            "rock4",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -100,
+            -190,
+            12.25 * collisionBodyOffset,
+            "rock5",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -100,
+            -200,
+            12.25 * collisionBodyOffset,
+            "rock6",
+            "rock3",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -170,
+            120,
+            12.25 * collisionBodyOffset,
+            "rock7",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -160,
+            120,
+            12.25 * collisionBodyOffset,
+            "rock8",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -150,
+            120,
+            12.25 * collisionBodyOffset,
+            "rock9",
+            "rock3",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            60,
+            -210,
+            12.25 * collisionBodyOffset,
+            "rock10",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            50,
+            -210,
+            12.25 * collisionBodyOffset,
+            "rock11",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            70,
+            -210,
+            12.25 * collisionBodyOffset,
+            "rock12",
+            "rock3",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            190,
+            170,
+            12.25 * collisionBodyOffset,
+            "rock13",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            200,
+            180,
+            12.25 * collisionBodyOffset,
+            "rock14",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            210,
+            170,
+            12.25 * collisionBodyOffset,
+            "rock15",
+            "rock3",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            190,
+            -50,
+            12.25 * collisionBodyOffset,
+            "rock16",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            170,
+            -50,
+            12.25 * collisionBodyOffset,
+            "rock17",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            180,
+            -50,
+            12.25 * collisionBodyOffset,
+            "rock18",
+            "rock3",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            190,
+            -200,
+            12.25 * collisionBodyOffset,
+            "rock19",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            200,
+            -190,
+            12.25 * collisionBodyOffset,
+            "rock20",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            210,
+            -200,
+            12.25 * collisionBodyOffset,
+            "rock21",
+            "rock3",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -140,
+            -20,
+            12.25 * collisionBodyOffset,
+            "rock22",
+            "rock1",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -160,
+            -20,
+            12.25 * collisionBodyOffset,
+            "rock23",
+            "rock2",
+            this.state.staticCircleEntities
+        );
+
+        new StaticCircleEntity(
+            -150,
+            -30,
+            12.25 * collisionBodyOffset,
+            "rock24",
+            "rock3",
+            this.state.staticCircleEntities
         );
     }
 
