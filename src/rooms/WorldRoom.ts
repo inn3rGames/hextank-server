@@ -657,6 +657,18 @@ export default class WorldRoom extends Room<WorldState> {
             }
         });
 
+        this.onMessage("shoot", (client) => {
+            const currentHexTank = this.state.hexTanks.get(client.sessionId);
+            new StaticCircleEntity(
+                currentHexTank.x - 0.95 * Math.cos(currentHexTank.angle),
+                currentHexTank.z - 0.95 * -Math.sin(currentHexTank.angle),
+                0.1,
+                performance.now().toString(),
+                "bullet",
+                this.state.staticCircleEntities
+            );
+        });
+
         this.setSimulationInterval((delta) => {
             this._updateWorld(delta);
         });
