@@ -19,7 +19,7 @@ export default class StaticRectangleEntity extends Schema {
         height: number,
         id: string,
         modelType: string,
-        group?: MapSchema<StaticRectangleEntity, string>
+        map?: MapSchema<StaticRectangleEntity, string>
     ) {
         super();
 
@@ -37,8 +37,8 @@ export default class StaticRectangleEntity extends Schema {
 
         this.modelType = modelType;
 
-        if (typeof group !== "undefined") {
-            group.set(this.id, this);
+        if (typeof map !== "undefined") {
+            map.set(this.id, this);
         }
     }
 }

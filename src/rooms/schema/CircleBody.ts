@@ -3,6 +3,7 @@ import Position from "./Interfaces";
 import HexTank from "./HexTank";
 import StaticCircleEntity from "./StaticCircleEntity";
 import StaticRectangleEntity from "./StaticRectangleEntity";
+import Bullet from "./Bullet";
 
 export default class CircleBody extends Schema {
     x: number;
@@ -15,13 +16,13 @@ export default class CircleBody extends Schema {
 
     keys: Array<string> = [];
 
-    private _parent: HexTank | StaticCircleEntity;
+    private _parent: HexTank | StaticCircleEntity | Bullet;
 
     constructor(
         x: number,
         z: number,
         radius: number,
-        parent: HexTank | StaticCircleEntity
+        parent: HexTank | StaticCircleEntity | Bullet
     ) {
         super();
 
@@ -95,7 +96,7 @@ export default class CircleBody extends Schema {
     setSpatialHash(
         spatialHash: Map<
             string,
-            Array<HexTank | StaticCircleEntity | StaticRectangleEntity>
+            Array<HexTank | StaticCircleEntity | StaticRectangleEntity | Bullet>
         >
     ) {
         this.keys = this.generateKeys();

@@ -1,5 +1,6 @@
-import { Schema, type } from "@colyseus/schema";
+import { MapSchema, Schema, type } from "@colyseus/schema";
 import CircleBody from "./CircleBody";
+import Bullet from "./Bullet";
 
 export default class HexTank extends Schema {
     @type("number") x: number;
@@ -39,12 +40,21 @@ export default class HexTank extends Schema {
 
     commands: Array<string> = [];
 
-    constructor(x: number, z: number, id: string) {
+    private _bulletsMap: MapSchema<Bullet>;
+
+    constructor(
+        x: number,
+        z: number,
+        id: string,
+        bulletsMap?: MapSchema<Bullet>
+    ) {
         super();
 
         this.x = x;
         this.z = z;
         this.id = id;
+
+        this._bulletsMap = bulletsMap;
 
         this.collisionBody = new CircleBody(this.x, this.z, 0.7, this);
     }
@@ -152,6 +162,19 @@ export default class HexTank extends Schema {
 
             if (currentCommand === "rightKeyUp") {
                 this._stopRotate();
+            }
+
+            if (typeof this._bulletsMap !== undefined) {
+                if (currentCommand === "shootDown") {
+                    new Bullet(
+                        this.x - 5 * Math.cos(this.angle),
+                        this.z - 5 * -Math.sin(this.angle),
+                        0.1,
+                        this.angle,
+                        this.id + performance.now().toString(),
+                        this._bulletsMap
+                    );
+                }
             }
         }
     }

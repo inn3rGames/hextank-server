@@ -3,6 +3,7 @@ import WorldState from "./schema/WorldState";
 import HexTank from "./schema/HexTank";
 import StaticCircleEntity from "./schema/StaticCircleEntity";
 import StaticRectangleEntity from "./schema/StaticRectangleEntity";
+import Bullet from "./schema/Bullet";
 
 export default class WorldRoom extends Room<WorldState> {
     maxClients: number = 25;
@@ -15,11 +16,11 @@ export default class WorldRoom extends Room<WorldState> {
     private _elapsedTime: number = Math.round(this._fixedFrameDuration);
     private _resetElapsedTime: boolean = true;
 
-    private _commandsPerFrame: number = 10;
+    private _commandsPerFrame: number = 100;
 
     private _spatialHash: Map<
         string,
-        Array<HexTank | StaticCircleEntity | StaticRectangleEntity>
+        Array<HexTank | StaticCircleEntity | StaticRectangleEntity | Bullet>
     > = new Map();
 
     private _generateCoordinate(): number {
@@ -657,18 +658,6 @@ export default class WorldRoom extends Room<WorldState> {
             }
         });
 
-        this.onMessage("shoot", (client) => {
-            const currentHexTank = this.state.hexTanks.get(client.sessionId);
-            new StaticCircleEntity(
-                currentHexTank.x - 0.95 * Math.cos(currentHexTank.angle),
-                currentHexTank.z - 0.95 * -Math.sin(currentHexTank.angle),
-                0.1,
-                performance.now().toString(),
-                "bullet",
-                this.state.staticCircleEntities
-            );
-        });
-
         this.setSimulationInterval((delta) => {
             this._updateWorld(delta);
         });
@@ -682,7 +671,8 @@ export default class WorldRoom extends Room<WorldState> {
         const currentHexTank = new HexTank(
             this._generateCoordinate(),
             this._generateCoordinate(),
-            client.sessionId
+            client.sessionId,
+            this.state.bullets
         );
 
         this.state.hexTanks.set(client.sessionId, currentHexTank);
@@ -706,8 +696,9 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     private _circleCircleCollision(
-        circleA: HexTank,
-        circleB: HexTank | StaticCircleEntity
+        circleA: HexTank | Bullet,
+        circleB: HexTank | StaticCircleEntity,
+        disableResponse?: boolean
     ) {
         const distanceX = circleB.x - circleA.x;
         const distanceZ = circleB.z - circleA.z;
@@ -721,15 +712,17 @@ export default class WorldRoom extends Room<WorldState> {
         const angle = Math.atan2(distanceZ, distanceX);
 
         if (distance <= radiiSum) {
-            const aX = circleA.x;
-            const aZ = circleA.z;
+            if (disableResponse !== true) {
+                const aX = circleA.x;
+                const aZ = circleA.z;
 
-            circleA.x = circleB.x - (radiiSum + 0.01) * Math.cos(angle);
-            circleA.z = circleB.z - (radiiSum + 0.01) * Math.sin(angle);
+                circleA.x = circleB.x - (radiiSum + 0.01) * Math.cos(angle);
+                circleA.z = circleB.z - (radiiSum + 0.01) * Math.sin(angle);
 
-            if (circleB.entityType === "HexTank") {
-                circleB.x = aX + (radiiSum + 0.01) * Math.cos(angle);
-                circleB.z = aZ + (radiiSum + 0.01) * Math.sin(angle);
+                if (circleB.entityType === "HexTank") {
+                    circleB.x = aX + (radiiSum + 0.01) * Math.cos(angle);
+                    circleB.z = aZ + (radiiSum + 0.01) * Math.sin(angle);
+                }
             }
 
             return true;
@@ -743,8 +736,9 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     private _circleRectangleCollision(
-        circle: HexTank,
-        rectangle: StaticRectangleEntity
+        circle: HexTank | Bullet,
+        rectangle: StaticRectangleEntity,
+        disableResponse?: boolean
     ) {
         let closestPointX = this._clamp(
             rectangle.x - rectangle.collisionBody.width * 0.5,
@@ -767,33 +761,35 @@ export default class WorldRoom extends Room<WorldState> {
         let depth = circle.collisionBody.radius - distance;
 
         if (distance <= circle.collisionBody.radius) {
-            if (closestPointX === circle.x && closestPointZ === circle.z) {
-                if (circle.x > rectangle.x) {
-                    closestPointX =
-                        rectangle.x + rectangle.collisionBody.width * 0.5;
-                } else {
-                    closestPointX =
-                        rectangle.x - rectangle.collisionBody.width * 0.5;
+            if (disableResponse !== true) {
+                if (closestPointX === circle.x && closestPointZ === circle.z) {
+                    if (circle.x > rectangle.x) {
+                        closestPointX =
+                            rectangle.x + rectangle.collisionBody.width * 0.5;
+                    } else {
+                        closestPointX =
+                            rectangle.x - rectangle.collisionBody.width * 0.5;
+                    }
+
+                    if (circle.z > rectangle.z) {
+                        closestPointZ =
+                            rectangle.z + rectangle.collisionBody.height * 0.5;
+                    } else {
+                        closestPointZ =
+                            rectangle.z - rectangle.collisionBody.height * 0.5;
+                    }
+
+                    distanceX = closestPointX - circle.x;
+                    distanceZ = closestPointZ - circle.z;
+                    distance = Math.sqrt(
+                        distanceX * distanceX + distanceZ * distanceZ
+                    );
+                    depth = circle.collisionBody.radius - distance;
                 }
 
-                if (circle.z > rectangle.z) {
-                    closestPointZ =
-                        rectangle.z + rectangle.collisionBody.height * 0.5;
-                } else {
-                    closestPointZ =
-                        rectangle.z - rectangle.collisionBody.height * 0.5;
-                }
-
-                distanceX = closestPointX - circle.x;
-                distanceZ = closestPointZ - circle.z;
-                distance = Math.sqrt(
-                    distanceX * distanceX + distanceZ * distanceZ
-                );
-                depth = circle.collisionBody.radius - distance;
+                circle.x = circle.x - (depth + 0.01) * Math.cos(angle);
+                circle.z = circle.z - (depth + 0.01) * Math.sin(angle);
             }
-
-            circle.x = circle.x - (depth + 0.01) * Math.cos(angle);
-            circle.z = circle.z - (depth + 0.01) * Math.sin(angle);
 
             return true;
         } else {
@@ -815,6 +811,11 @@ export default class WorldRoom extends Room<WorldState> {
         this.state.hexTanks.forEach((currentHexTank) => {
             currentHexTank.update();
             currentHexTank.collisionBody.setSpatialHash(this._spatialHash);
+        });
+
+        this.state.bullets.forEach((bullet) => {
+            bullet.update();
+            bullet.collisionBody.setSpatialHash(this._spatialHash);
         });
     }
 
@@ -860,6 +861,54 @@ export default class WorldRoom extends Room<WorldState> {
                                 ) {
                                     currentHexTank.collisionBody.collided =
                                         true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        this.state.bullets.forEach((currentBullet) => {
+            const currentKeys = currentBullet.collisionBody.keys;
+
+            for (let i = 0; i < currentKeys.length; i++) {
+                const currentEntitiesList = this._spatialHash.get(
+                    currentKeys[i]
+                );
+
+                if (typeof currentEntitiesList !== "undefined") {
+                    for (let j = 0; j < currentEntitiesList.length; j++) {
+                        let currentEntity = currentEntitiesList[j];
+                        if (currentEntity.id !== currentBullet.id) {
+                            if (currentEntity.collisionBody.type === "circle") {
+                                currentEntity = currentEntity as
+                                    | HexTank
+                                    | StaticCircleEntity;
+                                if (
+                                    this._circleCircleCollision(
+                                        currentBullet,
+                                        currentEntity,
+                                        true
+                                    )
+                                ) {
+                                    this.state.bullets.delete(currentBullet.id);
+                                }
+                            }
+
+                            if (
+                                currentEntity.collisionBody.type === "rectangle"
+                            ) {
+                                currentEntity =
+                                    currentEntity as StaticRectangleEntity;
+                                if (
+                                    this._circleRectangleCollision(
+                                        currentBullet,
+                                        currentEntity,
+                                        true
+                                    )
+                                ) {
+                                    this.state.bullets.delete(currentBullet.id);
                                 }
                             }
                         }

@@ -3,6 +3,7 @@ import Position from "./Interfaces";
 import HexTank from "./HexTank";
 import StaticCircleEntity from "./StaticCircleEntity";
 import StaticRectangleEntity from "./StaticRectangleEntity";
+import Bullet from "./Bullet";
 
 export default class RectangleBody extends Schema {
     x: number;
@@ -95,7 +96,7 @@ export default class RectangleBody extends Schema {
     setSpatialHash(
         spatialHash: Map<
             string,
-            Array<HexTank | StaticCircleEntity | StaticRectangleEntity>
+            Array<HexTank | StaticCircleEntity | StaticRectangleEntity | Bullet>
         >
     ) {
         const keys = this.generateKeys();
