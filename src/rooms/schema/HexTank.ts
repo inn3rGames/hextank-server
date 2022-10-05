@@ -41,6 +41,8 @@ export default class HexTank extends Schema {
     commands: Array<string> = [];
 
     private _bulletsMap: MapSchema<Bullet>;
+    private _shouldShoot: boolean = true;
+    private _shootCounter: number = 0;
 
     constructor(
         x: number,
@@ -135,46 +137,43 @@ export default class HexTank extends Schema {
             if (currentCommand === "upKeyDown") {
                 this._moveForward();
             }
-
             if (currentCommand === "downKeyDown") {
                 this._moveBackward();
             }
-
             if (currentCommand === "leftKeyDown") {
                 this._rotate(-1);
             }
-
             if (currentCommand === "rightKeyDown") {
                 this._rotate(1);
+            }
+            if (currentCommand === "shootDown") {
+                if (typeof this._bulletsMap !== undefined) {
+                    if (this._shouldShoot === true) {
+                        new Bullet(
+                            this.x - 0.95 * Math.cos(this.angle),
+                            this.z - 0.95 * -Math.sin(this.angle),
+                            0.1,
+                            this.angle,
+                            this.id + performance.now().toString(),
+                            this.id,
+                            this._bulletsMap
+                        );
+                        this._shouldShoot = false;
+                    }
+                }
             }
 
             if (currentCommand === "upKeyUp") {
                 this._stopMoveForward();
             }
-
             if (currentCommand === "downKeyUp") {
                 this._stopMoveBackward();
             }
-
             if (currentCommand === "leftKeyUp") {
                 this._stopRotate();
             }
-
             if (currentCommand === "rightKeyUp") {
                 this._stopRotate();
-            }
-
-            if (typeof this._bulletsMap !== undefined) {
-                if (currentCommand === "shootDown") {
-                    new Bullet(
-                        this.x - 5 * Math.cos(this.angle),
-                        this.z - 5 * -Math.sin(this.angle),
-                        0.1,
-                        this.angle,
-                        this.id + performance.now().toString(),
-                        this._bulletsMap
-                    );
-                }
             }
         }
     }
@@ -238,9 +237,20 @@ export default class HexTank extends Schema {
         this._setNewPosition();
     }
 
+    private _updateShooting() {
+        if (this._shouldShoot === false) {
+            this._shootCounter += 1;
+            if (this._shootCounter >= 15) {
+                this._shouldShoot = true;
+                this._shootCounter = 0;
+            }
+        }
+    }
+
     update() {
         this.processCommands();
         this._updateMovement();
         this.collisionBody.updateBody(this.x, this.z);
+        this._updateShooting();
     }
 }

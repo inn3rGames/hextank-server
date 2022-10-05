@@ -10,8 +10,12 @@ export default class Bullet extends Schema {
     @type(CircleBody) collisionBody: CircleBody;
 
     entityType: string = "Bullet";
+    parentId: string;
 
-    private _speed: number = -0.5;
+    private _map: MapSchema<Bullet, string>;
+    private _count: number = 0;
+
+    private _speed: number = -1;
 
     constructor(
         x: number,
@@ -19,7 +23,8 @@ export default class Bullet extends Schema {
         radius: number,
         angle: number,
         id: string,
-        map?: MapSchema<Bullet, string>
+        parentId: string,
+        map: MapSchema<Bullet, string>
     ) {
         super();
 
@@ -28,16 +33,22 @@ export default class Bullet extends Schema {
         this.angle = angle;
         this.id = id;
 
+        this.parentId = parentId;
+
         this.collisionBody = new CircleBody(this.x, this.z, radius, this);
 
-        if (typeof map !== "undefined") {
-            map.set(this.id, this);
-        }
+        this._map = map;
+        this._map.set(this.id, this);
     }
 
     update() {
         this.x += this._speed * Math.cos(this.angle);
         this.z += this._speed * -Math.sin(this.angle);
         this.collisionBody.updateBody(this.x, this.z);
+
+        this._count += 1;
+        if (this._count >= 120) {
+            this._map.delete(this.id);
+        }
     }
 }
