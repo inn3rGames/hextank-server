@@ -15,6 +15,10 @@ export default class HexTank extends Schema {
 
     @type(CircleBody) collisionBody: CircleBody;
 
+    @type("number") health: number = 5;
+    @type("number") damage: number = 0;
+    @type("number") kills: number = 0;
+
     entityType: string = "HexTank";
 
     private _jetFlameScaleMax: number = -0.22;

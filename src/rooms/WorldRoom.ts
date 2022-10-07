@@ -830,34 +830,57 @@ export default class WorldRoom extends Room<WorldState> {
 
                 if (typeof currentEntitiesList !== "undefined") {
                     for (let j = 0; j < currentEntitiesList.length; j++) {
-                        let currentEntity = currentEntitiesList[j];
+                        const currentEntity = currentEntitiesList[j];
                         if (currentEntity.id !== currentHexTank.id) {
                             if (currentEntity.collisionBody.type === "circle") {
-                                currentEntity = currentEntity as
+                                const circleEntity = currentEntity as
                                     | HexTank
                                     | StaticCircleEntity
                                     | Bullet;
 
-                                if (currentEntity.entityType === "Bullet") {
+                                if (circleEntity.entityType === "Bullet") {
                                     if (
                                         this._circleCircleCollision(
                                             currentHexTank,
-                                            currentEntity,
+                                            circleEntity,
                                             true
                                         )
                                     ) {
-                                        //console.log("tank hit");
+                                        const currentBullet =
+                                            circleEntity as Bullet;
+
+                                        const enemyHexTank =
+                                            this.state.hexTanks.get(
+                                                currentBullet.parentId
+                                            );
+
+                                        enemyHexTank.damage += 1;
+                                        currentHexTank.health -= 1;
+
+                                        currentHexTank.collisionBody.collided =
+                                            true;
+
+                                        if (currentHexTank.health <= 0) {
+                                            enemyHexTank.kills += 1;
+                                            this.state.hexTanks.delete(
+                                                currentHexTank.id
+                                            );
+                                        }
+
+                                        this.state.bullets.delete(
+                                            currentBullet.id
+                                        );
                                     }
                                 } else {
                                     if (
                                         this._circleCircleCollision(
                                             currentHexTank,
-                                            currentEntity
+                                            circleEntity
                                         )
                                     ) {
                                         currentHexTank.collisionBody.collided =
                                             true;
-                                        currentEntity.collisionBody.collided =
+                                        circleEntity.collisionBody.collided =
                                             true;
                                     }
                                 }
@@ -866,13 +889,13 @@ export default class WorldRoom extends Room<WorldState> {
                             if (
                                 currentEntity.collisionBody.type === "rectangle"
                             ) {
-                                currentEntity =
+                                const rectangleEntity =
                                     currentEntity as StaticRectangleEntity;
 
                                 if (
                                     this._circleRectangleCollision(
                                         currentHexTank,
-                                        currentEntity
+                                        rectangleEntity
                                     )
                                 ) {
                                     currentHexTank.collisionBody.collided =
@@ -895,40 +918,31 @@ export default class WorldRoom extends Room<WorldState> {
 
                 if (typeof currentEntitiesList !== "undefined") {
                     for (let j = 0; j < currentEntitiesList.length; j++) {
-                        let currentEntity = currentEntitiesList[j];
+                        const currentEntity = currentEntitiesList[j];
                         if (
                             currentEntity.id !== currentBullet.id &&
                             currentEntity.id !== "oasis1"
                         ) {
                             if (currentEntity.collisionBody.type === "circle") {
-                                currentEntity = currentEntity as
+                                const circleEntity = currentEntity as
                                     | HexTank
                                     | StaticCircleEntity
                                     | Bullet;
 
                                 if (
-                                    currentEntity.entityType !== "Bullet" &&
-                                    currentEntity.id !== currentBullet.parentId
+                                    circleEntity.entityType !== "Bullet" &&
+                                    circleEntity.id !== currentBullet.parentId
                                 ) {
                                     if (
                                         this._circleCircleCollision(
                                             currentBullet,
-                                            currentEntity,
+                                            circleEntity,
                                             true
                                         )
                                     ) {
                                         this.state.bullets.delete(
                                             currentBullet.id
                                         );
-
-                                        /* if (
-                                            currentEntity.entityType ===
-                                            "HexTank"
-                                        ) {
-                                            this.state.hexTanks.delete(
-                                                currentEntity.id
-                                            );
-                                        } */
                                     }
                                 }
                             }
@@ -936,13 +950,13 @@ export default class WorldRoom extends Room<WorldState> {
                             if (
                                 currentEntity.collisionBody.type === "rectangle"
                             ) {
-                                currentEntity =
+                                const rectangleEntity =
                                     currentEntity as StaticRectangleEntity;
 
                                 if (
                                     this._circleRectangleCollision(
                                         currentBullet,
-                                        currentEntity,
+                                        rectangleEntity,
                                         true
                                     )
                                 ) {
