@@ -13,7 +13,9 @@ export default class Bullet extends Schema {
     parentId: string;
 
     private _map: MapSchema<Bullet, string>;
+
     private _count: number = 0;
+    private _lifeTime: number = 720;
 
     private _speed: number = -1;
 
@@ -47,7 +49,7 @@ export default class Bullet extends Schema {
         this.collisionBody.updateBody(this.x, this.z);
 
         this._count += 1;
-        if (this._count >= 120) {
+        if (this._count >= this._lifeTime) {
             this._map.delete(this.id);
         }
     }
