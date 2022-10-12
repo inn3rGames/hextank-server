@@ -686,9 +686,12 @@ export default class WorldRoom extends Room<WorldState> {
     onLeave(client: Client, consented: boolean) {
         const currentHexTank = this.state.hexTanks.get(client.sessionId);
 
-        console.log(`HexTank ${currentHexTank.id} left!`);
-
-        this.state.hexTanks.delete(client.sessionId);
+        if (typeof currentHexTank !== "undefined") {
+            console.log(`HexTank ${currentHexTank.id} left!`);
+            this.state.hexTanks.delete(client.sessionId);
+        } else {
+            console.log("Already left!");
+        }
     }
 
     onDispose() {
