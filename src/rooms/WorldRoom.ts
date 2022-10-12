@@ -859,17 +859,21 @@ export default class WorldRoom extends Room<WorldState> {
                                                 currentBullet.parentId
                                             );
 
-                                        enemyHexTank.damage += 1;
-                                        currentHexTank.health -= 1;
+                                        if (
+                                            typeof enemyHexTank !== "undefined"
+                                        ) {
+                                            enemyHexTank.damage += 1;
+                                            currentHexTank.health -= 1;
 
-                                        currentHexTank.collisionBody.collided =
-                                            true;
+                                            currentHexTank.collisionBody.collided =
+                                                true;
 
-                                        if (currentHexTank.health <= 0) {
-                                            enemyHexTank.kills += 1;
-                                            this.state.hexTanks.delete(
-                                                currentHexTank.id
-                                            );
+                                            if (currentHexTank.health <= 0) {
+                                                enemyHexTank.kills += 1;
+                                                this.state.hexTanks.delete(
+                                                    currentHexTank.id
+                                                );
+                                            }
                                         }
 
                                         this.state.bullets.delete(
