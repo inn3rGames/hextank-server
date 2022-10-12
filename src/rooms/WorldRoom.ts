@@ -657,6 +657,8 @@ export default class WorldRoom extends Room<WorldState> {
                 ) {
                     currentHexTank.commands.push(command);
                 }
+            } else {
+                console.log("HexTank not found!");
             }
         });
 
@@ -679,7 +681,7 @@ export default class WorldRoom extends Room<WorldState> {
 
         this.state.hexTanks.set(client.sessionId, currentHexTank);
 
-        console.log(`HexTank ${currentHexTank.id} joined at: `, {
+        console.log(`${currentHexTank.id} joined at: `, {
             x: currentHexTank.x,
             z: currentHexTank.z,
         });
@@ -689,7 +691,7 @@ export default class WorldRoom extends Room<WorldState> {
         const currentHexTank = this.state.hexTanks.get(client.sessionId);
 
         if (typeof currentHexTank !== "undefined") {
-            console.log(`HexTank ${currentHexTank.id} left!`);
+            console.log(`${currentHexTank.id} left!`);
             this.state.hexTanks.delete(client.sessionId);
         } else {
             console.log("Already left!");
@@ -864,16 +866,23 @@ export default class WorldRoom extends Room<WorldState> {
                                         ) {
                                             enemyHexTank.damage += 1;
                                             currentHexTank.health -= 1;
-
                                             currentHexTank.collisionBody.collided =
                                                 true;
+                                            console.log(
+                                                `${enemyHexTank.id} shot ${currentHexTank.id}!`
+                                            );
 
                                             if (currentHexTank.health <= 0) {
                                                 enemyHexTank.kills += 1;
                                                 this.state.hexTanks.delete(
                                                     currentHexTank.id
                                                 );
+                                                console.log(
+                                                    `${enemyHexTank.id} killed ${currentHexTank.id}!`
+                                                );
                                             }
+                                        } else {
+                                            console.log("Enemy not found!");
                                         }
 
                                         this.state.bullets.delete(
@@ -1003,7 +1012,7 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     private _logMovement(currentHexTank: HexTank) {
-        console.log(`HexTank ${currentHexTank.id} moved to: `, {
+        console.log(`${currentHexTank.id} moved to: `, {
             x: currentHexTank.x,
             z: currentHexTank.z,
             angle: currentHexTank.angle,
