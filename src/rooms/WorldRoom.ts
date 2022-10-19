@@ -888,6 +888,11 @@ export default class WorldRoom extends Room<WorldState> {
                                         this.state.bullets.delete(
                                             currentBullet.id
                                         );
+
+                                        this.broadcast("bulletExplosion", {
+                                            x: currentBullet.x,
+                                            z: currentBullet.z,
+                                        });
                                     }
                                 } else {
                                     if (
@@ -961,6 +966,11 @@ export default class WorldRoom extends Room<WorldState> {
                                         this.state.bullets.delete(
                                             currentBullet.id
                                         );
+
+                                        this.broadcast("bulletExplosion", {
+                                            x: currentBullet.x,
+                                            z: currentBullet.z,
+                                        });
                                     }
                                 }
                             }
@@ -979,6 +989,11 @@ export default class WorldRoom extends Room<WorldState> {
                                     )
                                 ) {
                                     this.state.bullets.delete(currentBullet.id);
+
+                                    this.broadcast("bulletExplosion", {
+                                        x: currentBullet.x,
+                                        z: currentBullet.z,
+                                    });
                                 }
                             }
                         }
