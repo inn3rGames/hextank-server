@@ -880,6 +880,14 @@ export default class WorldRoom extends Room<WorldState> {
                                                 console.log(
                                                     `${enemyHexTank.id} killed ${currentHexTank.id}!`
                                                 );
+
+                                                this.broadcast(
+                                                    "hexTankExplosion",
+                                                    {
+                                                        x: currentHexTank.x,
+                                                        z: currentHexTank.z,
+                                                    }
+                                                );
                                             }
                                         } else {
                                             console.log("Enemy not found!");
