@@ -886,6 +886,12 @@ export default class WorldRoom extends Room<WorldState> {
                                                     {
                                                         x: currentHexTank.x,
                                                         z: currentHexTank.z,
+                                                        angle: currentHexTank.angle,
+                                                        id:
+                                                            "hexTankExplosion" +
+                                                            performance
+                                                                .now()
+                                                                .toString(),
                                                     }
                                                 );
                                             }
@@ -900,6 +906,10 @@ export default class WorldRoom extends Room<WorldState> {
                                         this.broadcast("bulletExplosion", {
                                             x: currentBullet.x,
                                             z: currentBullet.z,
+                                            angle: currentBullet.angle,
+                                            id:
+                                                "bulletExplosion" +
+                                                performance.now().toString(),
                                         });
                                     }
                                 } else {
@@ -978,6 +988,10 @@ export default class WorldRoom extends Room<WorldState> {
                                         this.broadcast("bulletExplosion", {
                                             x: currentBullet.x,
                                             z: currentBullet.z,
+                                            angle: currentBullet.angle,
+                                            id:
+                                                "bulletExplosion" +
+                                                performance.now().toString(),
                                         });
                                     }
                                 }
@@ -1001,6 +1015,10 @@ export default class WorldRoom extends Room<WorldState> {
                                     this.broadcast("bulletExplosion", {
                                         x: currentBullet.x,
                                         z: currentBullet.z,
+                                        angle: currentBullet.angle,
+                                        id:
+                                            "bulletExplosion" +
+                                            performance.now().toString(),
                                     });
                                 }
                             }
