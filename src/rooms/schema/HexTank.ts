@@ -5,9 +5,8 @@ import Bullet from "./Bullet";
 export default class HexTank extends Schema {
     @type("number") x: number;
     @type("number") z: number;
+    @type("number") angle: number;
     @type("string") id: string;
-
-    @type("number") angle: number = 0;
 
     @type("number") jetsRotationZ: number = 0;
     @type("number") jetsRotationX: number = 0;
@@ -51,6 +50,7 @@ export default class HexTank extends Schema {
     constructor(
         x: number,
         z: number,
+        angle: number,
         id: string,
         bulletsMap?: MapSchema<Bullet>
     ) {
@@ -58,6 +58,7 @@ export default class HexTank extends Schema {
 
         this.x = x;
         this.z = z;
+        this.angle = angle;
         this.id = id;
 
         this._bulletsMap = bulletsMap;

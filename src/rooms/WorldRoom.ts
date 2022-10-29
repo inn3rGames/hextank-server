@@ -23,10 +23,146 @@ export default class WorldRoom extends Room<WorldState> {
         Array<HexTank | StaticCircleEntity | StaticRectangleEntity | Bullet>
     > = new Map();
 
-    private _generateCoordinate(): number {
-        const min = -this._worldSize * 0.5;
-        const max = this._worldSize * 0.5;
-        return Math.floor(Math.random() * (max - min + 1) + min);
+    private _generatePosition(): {
+        x: number;
+        z: number;
+        angle: number;
+    } {
+        const possiblePositions: Array<{
+            x: number;
+            z: number;
+            angle: number;
+        }> = [
+            {
+                x: -240,
+                z: 0,
+                angle: Math.PI,
+            },
+            {
+                x: -110,
+                z: 140,
+                angle: Math.PI + Math.PI / 2,
+            },
+            {
+                x: -240,
+                z: 240,
+                angle: Math.PI,
+            },
+            {
+                x: 0,
+                z: -20,
+                angle: Math.PI + Math.PI / 2,
+            },
+            {
+                x: 60,
+                z: -230,
+                angle: 0,
+            },
+            {
+                x: -220,
+                z: 20,
+                angle: Math.PI,
+            },
+            {
+                x: -100,
+                z: -230,
+                angle: 0,
+            },
+            {
+                x: 50,
+                z: 230,
+                angle: Math.PI + Math.PI / 2,
+            },
+            {
+                x: -240,
+                z: -240,
+                angle: Math.PI,
+            },
+            {
+                x: 240,
+                z: -240,
+                angle: Math.PI / 2,
+            },
+            {
+                x: 240,
+                z: 240,
+                angle: 0,
+            },
+            {
+                x: -240,
+                z: 240,
+                angle: Math.PI + Math.PI / 2,
+            },
+            {
+                x: -40,
+                z: 140,
+                angle: Math.PI,
+            },
+            {
+                x: 40,
+                z: -60,
+                angle: 0,
+            },
+            {
+                x: 210,
+                z: -50,
+                angle: Math.PI + Math.PI / 2,
+            },
+            {
+                x: 30,
+                z: 50,
+                angle: Math.PI / 2,
+            },
+            {
+                x: 90,
+                z: 120,
+                angle: 0,
+            },
+            {
+                x: 0,
+                z: 180,
+                angle: 0,
+            },
+            {
+                x: -100,
+                z: -130,
+                angle: Math.PI,
+            },
+            {
+                x: -180,
+                z: -100,
+                angle: Math.PI / 2,
+            },
+            {
+                x: 230,
+                z: 180,
+                angle: Math.PI + Math.PI / 2,
+            },
+            {
+                x: 190,
+                z: -70,
+                angle: 0,
+            },
+            {
+                x: 50,
+                z: 20,
+                angle: 0,
+            },
+            {
+                x: 0,
+                z: -200,
+                angle: Math.PI / 2,
+            },
+            {
+                x: 180,
+                z: -30,
+                angle: 0,
+            },
+        ];
+
+        return possiblePositions[
+            Math.floor(Math.random() * possiblePositions.length)
+        ];
     }
 
     private _createMap() {
@@ -672,9 +808,12 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     onJoin(client: Client, options: any) {
+        const currentPosition = this._generatePosition();
+
         const currentHexTank = new HexTank(
-            this._generateCoordinate(),
-            this._generateCoordinate(),
+            currentPosition.x,
+            currentPosition.z,
+            currentPosition.angle,
             client.sessionId,
             this.state.bullets
         );
@@ -1050,13 +1189,5 @@ export default class WorldRoom extends Room<WorldState> {
             this._elapsedTime -= this._fixedFrameDuration;
             this._fixedUpdate();
         }
-    }
-
-    private _logMovement(currentHexTank: HexTank) {
-        console.log(`${currentHexTank.id} moved to: `, {
-            x: currentHexTank.x,
-            z: currentHexTank.z,
-            angle: currentHexTank.angle,
-        });
     }
 }
