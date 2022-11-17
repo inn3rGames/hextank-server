@@ -10,7 +10,6 @@ export default Arena({
     initializeGameServer: (gameServer) => {
         gameServer.define("world_room", WorldRoom);
         matchMaker.createRoom("world_room", {});
-        //gameServer.simulateLatency(500);
     },
 
     initializeExpress: (app) => {
@@ -18,14 +17,16 @@ export default Arena({
             res.send("HexTank Server ready!");
         });
 
+        const name = process.env.NAME;
+        const pass = process.env.PASS;
+        const users: { [key: string]: string } = {};
+        users[name] = pass;
         const basicAuthMiddleware = basicAuth({
-            users: {
-                "hex" : "hex",
-            },
+            users,
             challenge: true,
         });
         app.use("/panel", basicAuthMiddleware, monitor());
     },
 
-    beforeListen: () => { },
+    beforeListen: () => {},
 });
