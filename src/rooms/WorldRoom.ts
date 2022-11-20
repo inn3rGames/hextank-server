@@ -810,27 +810,40 @@ export default class WorldRoom extends Room<WorldState> {
     onJoin(client: Client, options: any) {
         const currentPosition = this._generatePosition();
 
+        let clientName;
+        if (options.name.length > 0) {
+            clientName = options.name;
+        } else {
+            clientName = "guest";
+        }
+
         const currentHexTank = new HexTank(
             currentPosition.x,
             currentPosition.z,
             currentPosition.angle,
             client.sessionId,
+            clientName,
             this.state.bullets
         );
 
         this.state.hexTanks.set(client.sessionId, currentHexTank);
 
-        console.log(`${currentHexTank.id} joined at: `, {
-            x: currentHexTank.x,
-            z: currentHexTank.z,
-        });
+        console.log(
+            `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.name} joined at: `,
+            {
+                x: currentHexTank.x,
+                z: currentHexTank.z,
+            }
+        );
     }
 
     onLeave(client: Client, consented: boolean) {
         const currentHexTank = this.state.hexTanks.get(client.sessionId);
 
         if (typeof currentHexTank !== "undefined") {
-            console.log(`${currentHexTank.id} left!`);
+            console.log(
+                `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.name} left!`
+            );
             this.state.hexTanks.delete(client.sessionId);
         } else {
             console.log("Already left!");
@@ -1008,7 +1021,7 @@ export default class WorldRoom extends Room<WorldState> {
                                             currentHexTank.collisionBody.collided =
                                                 true;
                                             console.log(
-                                                `${enemyHexTank.id} shot ${currentHexTank.id}!`
+                                                `${enemyHexTank.id} ${enemyHexTank.name} shot ${currentHexTank.id} ${currentHexTank.name}!`
                                             );
 
                                             if (currentHexTank.health <= 0) {
@@ -1017,7 +1030,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                     currentHexTank.id
                                                 );
                                                 console.log(
-                                                    `${enemyHexTank.id} killed ${currentHexTank.id}!`
+                                                    `${enemyHexTank.id} ${enemyHexTank.name} killed ${currentHexTank.id} ${currentHexTank.name}!`
                                                 );
 
                                                 this.broadcast(
