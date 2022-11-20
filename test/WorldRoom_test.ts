@@ -5,7 +5,7 @@ import StaticRectangleEntity from "../src/rooms/schema/StaticRectangleEntity";
 
 describe("Testing world room logic", () => {
     it("Limit HexTank top speed", () => {
-        const hexTank1 = new HexTank(100, 100, 0, "1");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
 
         hexTank1["_speed"] = 100;
         hexTank1["_updateMovement"]();
@@ -17,7 +17,7 @@ describe("Testing world room logic", () => {
     });
 
     it("Limit HexTank top rotation speed", () => {
-        const hexTank1 = new HexTank(100, 100, 0, "1");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
 
         hexTank1["_rotationSpeed"] = 100;
         hexTank1["_rotate"](1);
@@ -31,8 +31,8 @@ describe("Testing world room logic", () => {
     it("Circle bodies should collide", () => {
         const room = new WorldRoom();
 
-        const hexTank1 = new HexTank(100, 100, 0, "1");
-        const hexTank2 = new HexTank(100, 100, 0, "2");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
+        const hexTank2 = new HexTank(100, 100, 0, "2", "guest");
 
         assert.strictEqual(
             room["_circleCircleCollision"](hexTank1!, hexTank2!),
@@ -46,10 +46,10 @@ describe("Testing world room logic", () => {
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        const hexTank1 = new HexTank(100, 100, 0, "1");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        const hexTank2 = new HexTank(100, 100, 0, "2");
+        const hexTank2 = new HexTank(100, 100, 0, "2", "guest");
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
         room["_circleCircleCollision"](hexTank1!, hexTank2!);
@@ -64,7 +64,7 @@ describe("Testing world room logic", () => {
     it("Circle and rectangle bodies should collide", () => {
         const room = new WorldRoom();
 
-        const hexTank1 = new HexTank(100, 100, 0, "1");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
         const staticRectangleEntity = new StaticRectangleEntity(
             100,
             100,
@@ -89,7 +89,7 @@ describe("Testing world room logic", () => {
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        const hexTank1 = new HexTank(100, 100, 0, "1");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
         const staticRectangleEntity = new StaticRectangleEntity(
@@ -123,10 +123,10 @@ describe("Testing world room logic", () => {
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        const hexTank1 = new HexTank(100, 100, 0, "1");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        const hexTank2 = new HexTank(100, 100, 0, "2");
+        const hexTank2 = new HexTank(100, 100, 0, "2", "guest");
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
         room["_fixedUpdate"]();
@@ -140,10 +140,10 @@ describe("Testing world room logic", () => {
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
-        const hexTank1 = new HexTank(100, 100, 0, "1");
+        const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
-        const hexTank2 = new HexTank(100, 100, 0, "2");
+        const hexTank2 = new HexTank(100, 100, 0, "2", "guest");
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
         room["_fixedUpdate"]();
