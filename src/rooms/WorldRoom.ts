@@ -829,7 +829,7 @@ export default class WorldRoom extends Room<WorldState> {
         this.state.hexTanks.set(client.sessionId, currentHexTank);
 
         console.log(
-            `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.name} joined at: `,
+            `${currentHexTank.id} ${currentHexTank.name} joined at: `,
             {
                 x: currentHexTank.x,
                 z: currentHexTank.z,
@@ -842,7 +842,7 @@ export default class WorldRoom extends Room<WorldState> {
 
         if (typeof currentHexTank !== "undefined") {
             console.log(
-                `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.name} left!`
+                `${currentHexTank.id} ${currentHexTank.name} left!`
             );
             this.state.hexTanks.delete(client.sessionId);
         } else {
