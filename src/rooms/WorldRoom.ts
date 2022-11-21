@@ -810,9 +810,12 @@ export default class WorldRoom extends Room<WorldState> {
     onJoin(client: Client, options: any) {
         const currentPosition = this._generatePosition();
 
-        let clientName;
-        if (options.name.length > 0) {
-            clientName = options.name;
+        let clientName = options.name.toString().substring(0, 16);
+        if (clientName.length > 0) {
+            clientName = clientName.replace(/[^0-9a-z]/gi, "");
+            if (clientName.length <= 0) {
+                clientName = "guest";
+            }
         } else {
             clientName = "guest";
         }
@@ -828,13 +831,10 @@ export default class WorldRoom extends Room<WorldState> {
 
         this.state.hexTanks.set(client.sessionId, currentHexTank);
 
-        console.log(
-            `${currentHexTank.id} ${currentHexTank.name} joined at: `,
-            {
-                x: currentHexTank.x,
-                z: currentHexTank.z,
-            }
-        );
+        console.log(`${currentHexTank.id} ${currentHexTank.name} joined at: `, {
+            x: currentHexTank.x,
+            z: currentHexTank.z,
+        });
     }
 
     onLeave(client: Client, consented: boolean) {
