@@ -4,6 +4,10 @@ import basicAuth from "express-basic-auth";
 import { matchMaker } from "colyseus";
 import WorldRoom from "./rooms/WorldRoom";
 import pkg from "../package.json";
+import * as dotenv from "dotenv";
+dotenv.config({ path: "./" });
+
+console.log(process.env);
 
 export default Arena({
     getId: () => "HexTank Server",
