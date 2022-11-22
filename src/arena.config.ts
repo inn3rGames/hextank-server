@@ -22,13 +22,25 @@ export default Arena({
             res.send("HexTank Server ready!");
         });
 
-        const name = process.env.NAME;
-        const pass = process.env.PASS;
+        const envName = process.env.NAME;
+        const envPass = process.env.PASS;
         function customAuthorizer(inputName: any, inputPass: any): boolean {
-            const username = inputName.toString();
-            const password = inputPass.toString();
-            const isUser = basicAuth.safeCompare(username, name);
-            const isPass = basicAuth.safeCompare(password, pass);
+            const processedName = inputName.toString();
+            const processedPass = inputPass.toString();
+            let isUser = false;
+            let isPass = false;
+            if (
+                envName.includes(processedName) &&
+                envName.length === processedName.length
+            ) {
+                isUser = true;
+            }
+            if (
+                envPass.includes(processedPass) &&
+                envPass.length === processedPass.length
+            ) {
+                isPass = true;
+            }
             return isUser && isPass;
         }
         const basicAuthMiddleware = basicAuth({
