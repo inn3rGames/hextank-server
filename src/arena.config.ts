@@ -4,10 +4,6 @@ import basicAuth from "express-basic-auth";
 import { matchMaker } from "colyseus";
 import WorldRoom from "./rooms/WorldRoom";
 import pkg from "../package.json";
-import * as dotenv from "dotenv";
-dotenv.config({ path: "./" });
-
-console.log(process.env);
 
 export default Arena({
     getId: () => "HexTank Server",
@@ -26,29 +22,12 @@ export default Arena({
             res.send("HexTank Server ready!");
         });
 
-        function customAuthorizer(inputName: any, inputPass: any): boolean {
-            const envName = process.env.NAME;
-            const envPass = process.env.PASS;
-            const processedName = inputName.toString();
-            const processedPass = inputPass.toString();
-            let isUser = false;
-            let isPass = false;
-            if (
-                envName.includes(processedName) &&
-                envName.length === processedName.length
-            ) {
-                isUser = true;
-            }
-            if (
-                envPass.includes(processedPass) &&
-                envPass.length === processedPass.length
-            ) {
-                isPass = true;
-            }
-            return isUser && isPass;
-        }
+        const name = process.env.NAME;
+        const pass = process.env.PASS;
+        const users: { [key: string]: string } = {};
+        users[name] = pass;
         const basicAuthMiddleware = basicAuth({
-            authorizer: customAuthorizer,
+            users,
             challenge: true,
         });
         app.use("/panel", basicAuthMiddleware, monitor());
