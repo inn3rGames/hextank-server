@@ -24,10 +24,15 @@ export default Arena({
 
         const name = process.env.NAME;
         const pass = process.env.PASS;
-        const users: { [key: string]: string } = {};
-        users[name] = pass;
+        function customAuthorizer(inputName: any, inputPass: any): boolean {
+            const username = inputName.toString();
+            const password = inputPass.toString();
+            const isUser = basicAuth.safeCompare(username, name);
+            const isPass = basicAuth.safeCompare(password, pass);
+            return isUser && isPass;
+        }
         const basicAuthMiddleware = basicAuth({
-            users,
+            authorizer: customAuthorizer,
             challenge: true,
         });
         app.use("/panel", basicAuthMiddleware, monitor());
