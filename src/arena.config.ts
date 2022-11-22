@@ -22,9 +22,9 @@ export default Arena({
             res.send("HexTank Server ready!");
         });
 
-        const envName = process.env.NAME;
-        const envPass = process.env.PASS;
         function customAuthorizer(inputName: any, inputPass: any): boolean {
+            const envName = process.env.NAME;
+            const envPass = process.env.PASS;
             const processedName = inputName.toString();
             const processedPass = inputPass.toString();
             let isUser = false;
