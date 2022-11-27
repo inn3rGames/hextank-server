@@ -3,7 +3,6 @@ import { monitor } from "@colyseus/monitor";
 import basicAuth from "express-basic-auth";
 import { matchMaker } from "colyseus";
 import WorldRoom from "./rooms/WorldRoom";
-import pkg from "../package.json";
 
 export default Arena({
     getId: () => "HexTank Server",
@@ -14,8 +13,8 @@ export default Arena({
     },
 
     initializeExpress: (app) => {
-        const packageName = pkg.name;
-        const packageVersion = pkg.version;
+        const packageName = process.env.npm_package_name;
+        const packageVersion = process.env.npm_package_version;
         console.log(`${packageName} version: ${packageVersion}`);
 
         app.get("/", (req, res) => {
