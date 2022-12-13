@@ -9,6 +9,8 @@ export default class Bullet extends Schema {
 
     @type(CircleBody) collisionBody: CircleBody;
 
+    @type("boolean") invincibility: boolean;
+
     entityType: string = "Bullet";
     parentId: string;
 
@@ -26,6 +28,7 @@ export default class Bullet extends Schema {
         angle: number,
         id: string,
         parentId: string,
+        invincibility: boolean,
         map: MapSchema<Bullet, string>
     ) {
         super();
@@ -38,6 +41,8 @@ export default class Bullet extends Schema {
         this.parentId = parentId;
 
         this.collisionBody = new CircleBody(this.x, this.z, radius, this);
+
+        this.invincibility = invincibility;
 
         this._map = map;
         this._map.set(this.id, this);

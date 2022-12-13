@@ -19,6 +19,8 @@ export default class HexTank extends Schema {
     @type("number") damage: number = 0;
     @type("number") kills: number = 0;
 
+    @type("boolean") invincibility: boolean = true;
+
     entityType: string = "HexTank";
 
     private _jetFlameScaleMax: number = -0.22;
@@ -47,6 +49,8 @@ export default class HexTank extends Schema {
     private _bulletsMap: MapSchema<Bullet>;
     private _shouldShoot: boolean = true;
     private _shootCounter: number = 0;
+
+    private _invincibilityCounter: number = 0;
 
     constructor(
         x: number,
@@ -164,6 +168,7 @@ export default class HexTank extends Schema {
                             this.angle,
                             this.id + performance.now().toString(),
                             this.id,
+                            this.invincibility,
                             this._bulletsMap
                         );
                         this._shouldShoot = false;
@@ -255,10 +260,20 @@ export default class HexTank extends Schema {
         }
     }
 
+    private _updateInvincibility() {
+        if (this.invincibility === true) {
+            this._invincibilityCounter += 1;
+            if (this._invincibilityCounter >= 300) {
+                this.invincibility = false;
+            }
+        }
+    }
+
     update() {
         this.processCommands();
         this._updateMovement();
         this.collisionBody.updateBody(this.x, this.z);
         this._updateShooting();
+        this._updateInvincibility();
     }
 }
