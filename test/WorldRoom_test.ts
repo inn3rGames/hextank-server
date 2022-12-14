@@ -124,9 +124,11 @@ describe("Testing world room logic", () => {
         room.state.staticRectangleEntities.clear();
 
         const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
+        hexTank1.invincibility = false;
         room.state.hexTanks.set(hexTank1.id, hexTank1);
 
         const hexTank2 = new HexTank(100, 100, 0, "2", "guest");
+        hexTank2.invincibility = false;
         room.state.hexTanks.set(hexTank2.id, hexTank2);
 
         room["_fixedUpdate"]();
