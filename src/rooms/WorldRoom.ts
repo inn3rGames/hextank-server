@@ -1005,7 +1005,6 @@ export default class WorldRoom extends Room<WorldState> {
                                     ) {
                                         const currentBullet =
                                             circleEntity as Bullet;
-
                                         const enemyHexTank =
                                             this.state.hexTanks.get(
                                                 currentBullet.parentId
@@ -1014,55 +1013,98 @@ export default class WorldRoom extends Room<WorldState> {
                                         if (
                                             typeof enemyHexTank !== "undefined"
                                         ) {
-                                            enemyHexTank.damage += 1;
-                                            currentHexTank.health -= 1;
-                                            currentHexTank.collisionBody.collided =
-                                                true;
-                                            console.log(
-                                                `${enemyHexTank.id} ${enemyHexTank.name} shot ${currentHexTank.id} ${currentHexTank.name}!`
-                                            );
-
-                                            if (currentHexTank.health <= 0) {
-                                                enemyHexTank.kills += 1;
-                                                this.state.hexTanks.delete(
-                                                    currentHexTank.id
-                                                );
+                                            if (
+                                                currentHexTank.invincibility ===
+                                                    false &&
+                                                currentBullet.invincibility ===
+                                                    false
+                                            ) {
+                                                enemyHexTank.damage += 1;
+                                                currentHexTank.health -= 1;
+                                                currentHexTank.collisionBody.collided =
+                                                    true;
                                                 console.log(
-                                                    `${enemyHexTank.id} ${enemyHexTank.name} killed ${currentHexTank.id} ${currentHexTank.name}!`
+                                                    `${enemyHexTank.id} ${enemyHexTank.name} shot ${currentHexTank.id} ${currentHexTank.name}!`
                                                 );
 
-                                                this.broadcast(
-                                                    "hexTankExplosion",
-                                                    {
-                                                        x: currentHexTank.x,
-                                                        z: currentHexTank.z,
-                                                        angle: currentHexTank.angle,
-                                                        id:
-                                                            "hexTankExplosion" +
-                                                            performance
-                                                                .now()
-                                                                .toString(),
-                                                    }
-                                                );
+                                                if (
+                                                    currentHexTank.health <= 0
+                                                ) {
+                                                    enemyHexTank.kills += 1;
+                                                    this.state.hexTanks.delete(
+                                                        currentHexTank.id
+                                                    );
+                                                    console.log(
+                                                        `${enemyHexTank.id} ${enemyHexTank.name} killed ${currentHexTank.id} ${currentHexTank.name}!`
+                                                    );
+
+                                                    this.broadcast(
+                                                        "hexTankExplosion",
+                                                        {
+                                                            x: currentHexTank.x,
+                                                            z: currentHexTank.z,
+                                                            angle: currentHexTank.angle,
+                                                            id:
+                                                                "hexTankExplosion" +
+                                                                performance
+                                                                    .now()
+                                                                    .toString(),
+                                                        }
+                                                    );
+                                                }
                                             }
                                         } else {
                                             console.log("Enemy not found!");
                                         }
 
+                                        if (
+                                            currentBullet.invincibility ===
+                                                false &&
+                                            currentHexTank.invincibility ===
+                                                false
+                                        ) {
+                                            this.broadcast("bulletExplosion", {
+                                                x: currentBullet.x,
+                                                z: currentBullet.z,
+                                                angle: currentBullet.angle,
+                                                id:
+                                                    "bulletExplosion" +
+                                                    performance
+                                                        .now()
+                                                        .toString(),
+                                            });
+                                        }
                                         this.state.bullets.delete(
                                             currentBullet.id
                                         );
-
-                                        this.broadcast("bulletExplosion", {
-                                            x: currentBullet.x,
-                                            z: currentBullet.z,
-                                            angle: currentBullet.angle,
-                                            id:
-                                                "bulletExplosion" +
-                                                performance.now().toString(),
-                                        });
                                     }
-                                } else {
+                                }
+
+                                if (circleEntity.entityType === "HexTank") {
+                                    const enemyHexTank = circleEntity as Bullet;
+
+                                    if (
+                                        currentHexTank.invincibility ===
+                                            false &&
+                                        enemyHexTank.invincibility === false
+                                    ) {
+                                        if (
+                                            this._circleCircleCollision(
+                                                currentHexTank,
+                                                circleEntity
+                                            )
+                                        ) {
+                                            currentHexTank.collisionBody.collided =
+                                                true;
+                                            circleEntity.collisionBody.collided =
+                                                true;
+                                        }
+                                    }
+                                }
+
+                                if (
+                                    circleEntity.entityType === "StaticCircle"
+                                ) {
                                     if (
                                         this._circleCircleCollision(
                                             currentHexTank,
@@ -1131,18 +1173,54 @@ export default class WorldRoom extends Room<WorldState> {
                                             true
                                         )
                                     ) {
+                                        if (
+                                            currentBullet.invincibility ===
+                                            false
+                                        ) {
+                                            if (
+                                                circleEntity.entityType ===
+                                                "HexTank"
+                                            ) {
+                                                const currentHexTank =
+                                                    circleEntity as HexTank;
+
+                                                if (
+                                                    currentHexTank.invincibility ===
+                                                    false
+                                                ) {
+                                                    this.broadcast(
+                                                        "bulletExplosion",
+                                                        {
+                                                            x: currentBullet.x,
+                                                            z: currentBullet.z,
+                                                            angle: currentBullet.angle,
+                                                            id:
+                                                                "bulletExplosion" +
+                                                                performance
+                                                                    .now()
+                                                                    .toString(),
+                                                        }
+                                                    );
+                                                }
+                                            } else {
+                                                this.broadcast(
+                                                    "bulletExplosion",
+                                                    {
+                                                        x: currentBullet.x,
+                                                        z: currentBullet.z,
+                                                        angle: currentBullet.angle,
+                                                        id:
+                                                            "bulletExplosion" +
+                                                            performance
+                                                                .now()
+                                                                .toString(),
+                                                    }
+                                                );
+                                            }
+                                        }
                                         this.state.bullets.delete(
                                             currentBullet.id
                                         );
-
-                                        this.broadcast("bulletExplosion", {
-                                            x: currentBullet.x,
-                                            z: currentBullet.z,
-                                            angle: currentBullet.angle,
-                                            id:
-                                                "bulletExplosion" +
-                                                performance.now().toString(),
-                                        });
                                     }
                                 }
                             }
@@ -1160,16 +1238,17 @@ export default class WorldRoom extends Room<WorldState> {
                                         true
                                     )
                                 ) {
+                                    if (currentBullet.invincibility === false) {
+                                        this.broadcast("bulletExplosion", {
+                                            x: currentBullet.x,
+                                            z: currentBullet.z,
+                                            angle: currentBullet.angle,
+                                            id:
+                                                "bulletExplosion" +
+                                                performance.now().toString(),
+                                        });
+                                    }
                                     this.state.bullets.delete(currentBullet.id);
-
-                                    this.broadcast("bulletExplosion", {
-                                        x: currentBullet.x,
-                                        z: currentBullet.z,
-                                        angle: currentBullet.angle,
-                                        id:
-                                            "bulletExplosion" +
-                                            performance.now().toString(),
-                                    });
                                 }
                             }
                         }
