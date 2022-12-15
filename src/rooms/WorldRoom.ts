@@ -978,8 +978,9 @@ export default class WorldRoom extends Room<WorldState> {
 
     private _checkCollisions() {
         this.state.hexTanks.forEach((currentHexTank) => {
-            const currentKeys = currentHexTank.collisionBody.keys;
+            const alreadyCheckedList: Array<string> = [];
 
+            const currentKeys = currentHexTank.collisionBody.keys;
             for (let i = 0; i < currentKeys.length; i++) {
                 const currentEntitiesList = this._spatialHash.get(
                     currentKeys[i]
@@ -988,7 +989,12 @@ export default class WorldRoom extends Room<WorldState> {
                 if (typeof currentEntitiesList !== "undefined") {
                     for (let j = 0; j < currentEntitiesList.length; j++) {
                         const currentEntity = currentEntitiesList[j];
-                        if (currentEntity.id !== currentHexTank.id) {
+                        if (
+                            currentEntity.id !== currentHexTank.id &&
+                            alreadyCheckedList.indexOf(currentEntity.id) === -1
+                        ) {
+                            alreadyCheckedList.push(currentEntity.id);
+
                             if (currentEntity.collisionBody.type === "circle") {
                                 const circleEntity = currentEntity as
                                     | HexTank
@@ -996,87 +1002,98 @@ export default class WorldRoom extends Room<WorldState> {
                                     | Bullet;
 
                                 if (circleEntity.entityType === "Bullet") {
-                                    if (
-                                        this._circleCircleCollision(
-                                            currentHexTank,
-                                            circleEntity,
-                                            true
-                                        )
-                                    ) {
-                                        const currentBullet =
-                                            circleEntity as Bullet;
-                                        const enemyHexTank =
-                                            this.state.hexTanks.get(
-                                                currentBullet.parentId
-                                            );
+                                    const currentBullet =
+                                        circleEntity as Bullet;
 
+                                    if (
+                                        currentBullet.parentId !==
+                                        currentHexTank.id
+                                    ) {
                                         if (
-                                            typeof enemyHexTank !== "undefined"
+                                            this._circleCircleCollision(
+                                                currentHexTank,
+                                                circleEntity,
+                                                true
+                                            )
                                         ) {
-                                            if (
-                                                currentHexTank.invincibility ===
-                                                    false &&
-                                                currentBullet.invincibility ===
-                                                    false
-                                            ) {
-                                                enemyHexTank.damage += 1;
-                                                currentHexTank.health -= 1;
-                                                currentHexTank.collisionBody.collided =
-                                                    true;
-                                                console.log(
-                                                    `${enemyHexTank.id} ${enemyHexTank.name} shot ${currentHexTank.id} ${currentHexTank.name}!`
+                                            const enemyHexTank =
+                                                this.state.hexTanks.get(
+                                                    currentBullet.parentId
                                                 );
 
+                                            if (
+                                                typeof enemyHexTank !==
+                                                "undefined"
+                                            ) {
                                                 if (
-                                                    currentHexTank.health <= 0
+                                                    currentHexTank.invincibility ===
+                                                        false &&
+                                                    currentBullet.invincibility ===
+                                                        false
                                                 ) {
-                                                    enemyHexTank.kills += 1;
-                                                    this.state.hexTanks.delete(
-                                                        currentHexTank.id
-                                                    );
+                                                    enemyHexTank.damage += 1;
+                                                    currentHexTank.health -= 1;
+                                                    currentHexTank.collisionBody.collided =
+                                                        true;
                                                     console.log(
-                                                        `${enemyHexTank.id} ${enemyHexTank.name} killed ${currentHexTank.id} ${currentHexTank.name}!`
+                                                        `${enemyHexTank.id} ${enemyHexTank.name} shot ${currentHexTank.id} ${currentHexTank.name}!`
                                                     );
 
-                                                    this.broadcast(
-                                                        "hexTankExplosion",
-                                                        {
-                                                            x: currentHexTank.x,
-                                                            z: currentHexTank.z,
-                                                            angle: currentHexTank.angle,
-                                                            id:
-                                                                "hexTankExplosion" +
-                                                                performance
-                                                                    .now()
-                                                                    .toString(),
-                                                        }
-                                                    );
+                                                    if (
+                                                        currentHexTank.health <=
+                                                        0
+                                                    ) {
+                                                        enemyHexTank.kills += 1;
+                                                        this.state.hexTanks.delete(
+                                                            currentHexTank.id
+                                                        );
+                                                        console.log(
+                                                            `${enemyHexTank.id} ${enemyHexTank.name} killed ${currentHexTank.id} ${currentHexTank.name}!`
+                                                        );
+
+                                                        this.broadcast(
+                                                            "hexTankExplosion",
+                                                            {
+                                                                x: currentHexTank.x,
+                                                                z: currentHexTank.z,
+                                                                angle: currentHexTank.angle,
+                                                                id:
+                                                                    "hexTankExplosion" +
+                                                                    performance
+                                                                        .now()
+                                                                        .toString(),
+                                                            }
+                                                        );
+                                                    }
                                                 }
+                                            } else {
+                                                console.log("Enemy not found!");
                                             }
-                                        } else {
-                                            console.log("Enemy not found!");
-                                        }
 
-                                        if (
-                                            currentBullet.invincibility ===
-                                                false &&
-                                            currentHexTank.invincibility ===
-                                                false
-                                        ) {
-                                            this.broadcast("bulletExplosion", {
-                                                x: currentBullet.x,
-                                                z: currentBullet.z,
-                                                angle: currentBullet.angle,
-                                                id:
-                                                    "bulletExplosion" +
-                                                    performance
-                                                        .now()
-                                                        .toString(),
-                                            });
+                                            if (
+                                                currentBullet.invincibility ===
+                                                    false &&
+                                                currentHexTank.invincibility ===
+                                                    false
+                                            ) {
+                                                this.broadcast(
+                                                    "bulletExplosion",
+                                                    {
+                                                        x: currentBullet.x,
+                                                        z: currentBullet.z,
+                                                        angle: currentBullet.angle,
+                                                        id:
+                                                            "bulletExplosion" +
+                                                            performance
+                                                                .now()
+                                                                .toString(),
+                                                    }
+                                                );
+                                            }
+                                            this.state.bullets.delete(
+                                                currentBullet.id
+                                            );
                                         }
-                                        this.state.bullets.delete(
-                                            currentBullet.id
-                                        );
                                     }
                                 }
 
