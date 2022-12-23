@@ -4,6 +4,7 @@ import HexTank from "./schema/HexTank";
 import StaticCircleEntity from "./schema/StaticCircleEntity";
 import StaticRectangleEntity from "./schema/StaticRectangleEntity";
 import Bullet from "./schema/Bullet";
+import NimiqAPI from "../NimiqAPI";
 
 export default class WorldRoom extends Room<WorldState> {
     maxClients: number = 25;
@@ -22,6 +23,8 @@ export default class WorldRoom extends Room<WorldState> {
         string,
         Array<HexTank | StaticCircleEntity | StaticRectangleEntity | Bullet>
     > = new Map();
+
+    private _nimiqAPI: NimiqAPI;
 
     private _generatePosition(): {
         x: number;
@@ -778,7 +781,11 @@ export default class WorldRoom extends Room<WorldState> {
         );
     }
 
-    onCreate(options: any) {
+    async onCreate(options: any) {
+        this._nimiqAPI = new NimiqAPI();
+        this._nimiqAPI.loadWallet();
+        await this._nimiqAPI.init();
+
         this.setState(new WorldState());
 
         this._createMap();
@@ -805,6 +812,10 @@ export default class WorldRoom extends Room<WorldState> {
         if (options.test !== true) {
             console.log(`WorldRoom ${this.roomId} created.`);
         }
+    }
+
+    onAuth(client: Client, options: any) {
+        return this._nimiqAPI.verify(options);
     }
 
     onJoin(client: Client, options: any) {

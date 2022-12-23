@@ -39,13 +39,21 @@ export default class NimiqAPI {
     }
 
     async sendNimTo(userFriendlyAddress: string, amount: number) {
-        const tx = this._wallet.createTransaction(
+        const transaction = this._wallet.createTransaction(
             Nimiq.Address.fromUserFriendlyAddress(userFriendlyAddress),
             Nimiq.Policy.coinsToLunas(amount),
             500,
             this._blockchain.height
         );
 
-        let result = await this._client.sendTransaction(tx);
+        let result = await this._client.sendTransaction(transaction);
+    }
+
+    verify(options: any) {
+        const transactionData = options.signedTransaction.serializedTx;
+        const transaction = Nimiq.ExtendedTransaction.unserialize(
+            Nimiq.BufferUtils.fromAny(transactionData)
+        );
+        return transaction.verify(options.signedTransaction.raw.networkId);
     }
 }
