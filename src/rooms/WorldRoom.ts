@@ -782,10 +782,6 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     async onCreate(options: any) {
-        this._nimiqAPI = new NimiqAPI();
-        this._nimiqAPI.loadWallet();
-        await this._nimiqAPI.init();
-
         this.setState(new WorldState());
 
         this._createMap();
@@ -810,6 +806,9 @@ export default class WorldRoom extends Room<WorldState> {
         });
 
         if (options.test !== true) {
+            this._nimiqAPI = new NimiqAPI();
+            this._nimiqAPI.loadWallet();
+            await this._nimiqAPI.init();
             console.log(`WorldRoom ${this.roomId} created.`);
         }
     }
