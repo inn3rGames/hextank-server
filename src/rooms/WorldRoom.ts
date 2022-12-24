@@ -25,6 +25,7 @@ export default class WorldRoom extends Room<WorldState> {
     > = new Map();
 
     private _nimiqAPI: NimiqAPI;
+    private _nimiqTransactions: Map<string, any> = new Map();
 
     private _generatePosition(): {
         x: number;
@@ -788,7 +789,7 @@ export default class WorldRoom extends Room<WorldState> {
     async onCreate(options: any) {
         this._nimiqAPI = new NimiqAPI();
         this._nimiqAPI.loadWallet();
-        await this._nimiqAPI.init();
+        await this._nimiqAPI.connect();
 
         this._fillState();
 
@@ -839,22 +840,28 @@ export default class WorldRoom extends Room<WorldState> {
             currentPosition.angle,
             client.sessionId,
             clientName,
+            options.signedTransaction.raw.sender,
             this.state.bullets
         );
 
         this.state.hexTanks.set(client.sessionId, currentHexTank);
 
-        console.log(`${currentHexTank.id} ${currentHexTank.name} joined at: `, {
-            x: currentHexTank.x,
-            z: currentHexTank.z,
-        });
+        console.log(
+            `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress} joined at: `,
+            {
+                x: currentHexTank.x,
+                z: currentHexTank.z,
+            }
+        );
     }
 
     onLeave(client: Client, consented: boolean) {
         const currentHexTank = this.state.hexTanks.get(client.sessionId);
 
         if (typeof currentHexTank !== "undefined") {
-            console.log(`${currentHexTank.id} ${currentHexTank.name} left!`);
+            console.log(
+                `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress} left!`
+            );
             this.state.hexTanks.delete(client.sessionId);
         } else {
             console.log("Already left!");
@@ -1049,7 +1056,12 @@ export default class WorldRoom extends Room<WorldState> {
                                                     currentHexTank.collisionBody.collided =
                                                         true;
                                                     console.log(
-                                                        `${enemyHexTank.id} ${enemyHexTank.name} shot ${currentHexTank.id} ${currentHexTank.name}!`
+                                                        `${enemyHexTank.id} ${enemyHexTank.name} ${enemyHexTank.userFriendlyAddress} shot ${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress}!`
+                                                    );
+
+                                                    this._nimiqAPI.payoutTo(
+                                                        enemyHexTank.userFriendlyAddress,
+                                                        90
                                                     );
 
                                                     if (
@@ -1061,7 +1073,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                             currentHexTank.id
                                                         );
                                                         console.log(
-                                                            `${enemyHexTank.id} ${enemyHexTank.name} killed ${currentHexTank.id} ${currentHexTank.name}!`
+                                                            `${enemyHexTank.id} ${enemyHexTank.name} ${enemyHexTank.userFriendlyAddress} killed ${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress}!`
                                                         );
 
                                                         this.broadcast(

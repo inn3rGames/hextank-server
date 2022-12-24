@@ -1,4 +1,5 @@
 import Nimiq from "@nimiq/core";
+import { raw } from "express";
 
 export default class NimiqAPI {
     private _seed: string;
@@ -6,7 +7,9 @@ export default class NimiqAPI {
     private _privateKey: Nimiq.PrivateKey;
     private _keyPair: Nimiq.KeyPair;
     private _wallet: Nimiq.Wallet;
-    private _client: Nimiq.NanoConsensus;
+
+    private _consensus: Nimiq.NanoConsensus;
+    consensusEstablished: boolean = false;
     private _blockchain: Nimiq.NanoChain;
     private _network: Nimiq.Network;
     private _mempool: Nimiq.NanoMempool;
@@ -21,32 +24,21 @@ export default class NimiqAPI {
         this._wallet = new Nimiq.Wallet(this._keyPair);
     }
 
-    async init() {
+    async connect() {
         Nimiq.GenesisConfig.test();
-        await this.enableNimiq();
-    }
 
-    async enableNimiq() {
-        this._client = await Nimiq.Consensus.nano();
-        this._blockchain = this._client.blockchain;
-        this._network = this._client.network;
-        this._mempool = this._client.mempool;
+        this._consensus = await Nimiq.Consensus.nano();
+        this._blockchain = this._consensus.blockchain;
+        this._network = this._consensus.network;
+        this._mempool = this._consensus.mempool;
         this._network.connect();
 
-        this._client.on("established", () => {
-            this._client.subscribeAccounts([this._wallet.address]);
+        this._consensus.on("established", () => {
+            this.consensusEstablished = true;
         });
-    }
-
-    async sendNimTo(userFriendlyAddress: string, amount: number) {
-        const transaction = this._wallet.createTransaction(
-            Nimiq.Address.fromUserFriendlyAddress(userFriendlyAddress),
-            Nimiq.Policy.coinsToLunas(amount),
-            500,
-            this._blockchain.height
-        );
-
-        let result = await this._client.sendTransaction(transaction);
+        this._consensus.on("lost", () => {
+            this.consensusEstablished = false;
+        });
     }
 
     verify(options: any) {
@@ -55,5 +47,41 @@ export default class NimiqAPI {
             Nimiq.BufferUtils.fromAny(transactionData)
         );
         return transaction.verify(options.signedTransaction.raw.networkId);
+    }
+
+    async payoutTo(userFriendlyAddress: string, amount: number) {
+        const rawExtraData = `HexTank.io prize for shooting a player ${Date.now()}`;
+        const extraData = Nimiq.BufferUtils.fromAscii(rawExtraData);
+
+        const transaction = new Nimiq.ExtendedTransaction(
+            this._wallet.address,
+            Nimiq.Account.Type.BASIC,
+            Nimiq.Address.fromUserFriendlyAddress(userFriendlyAddress),
+            Nimiq.Account.Type.BASIC,
+            Nimiq.Policy.coinsToLunas(amount),
+            500,
+            await this._consensus.getHeadHeight(),
+            Nimiq.Transaction.Flag.NONE,
+            extraData
+        );
+
+        const signature = Nimiq.Signature.create(
+            this._keyPair.privateKey,
+            this._keyPair.publicKey,
+            transaction.serializeContent()
+        );
+
+        const proof = Nimiq.SignatureProof.singleSig(
+            this._keyPair.publicKey,
+            signature
+        );
+        transaction.proof = proof.serialize();
+
+        const result = await this._consensus.sendTransaction(transaction);
+        if (result === 1) {
+            console.log(`Payment sent ${result} ${transaction.hash}`);
+        } else {
+            console.log(`Payment failed ${result} ${transaction.hash}`);
+        }
     }
 }
