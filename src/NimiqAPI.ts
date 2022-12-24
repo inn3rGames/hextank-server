@@ -79,9 +79,9 @@ export default class NimiqAPI {
 
         const result = await this._consensus.sendTransaction(transaction);
         if (result === 1) {
-            console.log(`Payment sent ${result} ${transaction.hash}`);
+            console.log(`Payment sent ${result} ${transaction.hash()}`);
         } else {
-            console.log(`Payment failed ${result} ${transaction.hash}`);
+            console.log(`Payment failed ${result} ${transaction.hash()}`);
         }
     }
 }
