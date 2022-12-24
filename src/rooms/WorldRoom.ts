@@ -781,8 +781,16 @@ export default class WorldRoom extends Room<WorldState> {
         );
     }
 
-    async onCreate(options: any) {
+    private _fillState() {
         this.setState(new WorldState());
+    }
+
+    async onCreate(options: any) {
+        this._nimiqAPI = new NimiqAPI();
+        this._nimiqAPI.loadWallet();
+        await this._nimiqAPI.init();
+
+        this._fillState();
 
         this._createMap();
 
@@ -805,12 +813,7 @@ export default class WorldRoom extends Room<WorldState> {
             this._updateWorld(delta);
         });
 
-        if (options.test !== true) {
-            this._nimiqAPI = new NimiqAPI();
-            this._nimiqAPI.loadWallet();
-            await this._nimiqAPI.init();
-            console.log(`WorldRoom ${this.roomId} created.`);
-        }
+        console.log(`WorldRoom ${this.roomId} created.`);
     }
 
     onAuth(client: Client, options: any) {

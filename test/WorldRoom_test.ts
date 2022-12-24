@@ -42,7 +42,7 @@ describe("Testing world room logic", () => {
 
     it("Circle bodies should not collide", async () => {
         const room = new WorldRoom();
-        room.onCreate({ test: true });
+        room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
@@ -85,7 +85,7 @@ describe("Testing world room logic", () => {
 
     it("Circle and rectangle bodies should not collide", () => {
         const room = new WorldRoom();
-        room.onCreate({ test: true });
+        room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
@@ -119,7 +119,7 @@ describe("Testing world room logic", () => {
 
     it("Spatial hash should find collision", () => {
         const room = new WorldRoom();
-        room.onCreate({ test: true });
+        room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
@@ -138,7 +138,7 @@ describe("Testing world room logic", () => {
 
     it("Spatial hash should not find collision", () => {
         const room = new WorldRoom();
-        room.onCreate({ test: true });
+        room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
 
