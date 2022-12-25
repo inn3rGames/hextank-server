@@ -1,5 +1,4 @@
 import Nimiq from "@nimiq/core";
-import { raw } from "express";
 
 export default class NimiqAPI {
     private _seed: string;
@@ -10,10 +9,11 @@ export default class NimiqAPI {
 
     private _consensus: Nimiq.NanoConsensus;
     consensusEstablished: boolean = false;
-    private _blockchain: Nimiq.NanoChain;
     private _network: Nimiq.Network;
-    private _mempool: Nimiq.NanoMempool;
+
+    private _blockchain: Nimiq.NanoChain;
     temporaryBalance: number = 0;
+    private _lastBalance: number = 0;
 
     loadWallet() {
         this._seed = process.env.SEED;
@@ -31,7 +31,6 @@ export default class NimiqAPI {
         this._consensus = await Nimiq.Consensus.nano();
         this._blockchain = this._consensus.blockchain;
         this._network = this._consensus.network;
-        this._mempool = this._consensus.mempool;
         this._network.connect();
 
         this._consensus.on("established", () => {
@@ -46,8 +45,12 @@ export default class NimiqAPI {
                 const account = await this._consensus.getAccount(
                     this._wallet.address
                 );
-                this.temporaryBalance = account.balance;
-                console.log("Balance update", this.temporaryBalance);
+
+                if (this._lastBalance !== account.balance) {
+                    this.temporaryBalance = account.balance;
+                    this._lastBalance = account.balance;
+                    console.log("Balance update", this.temporaryBalance);
+                }
             }
         });
     }
