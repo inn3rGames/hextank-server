@@ -13,6 +13,7 @@ export default class NimiqAPI {
     private _blockchain: Nimiq.NanoChain;
     private _network: Nimiq.Network;
     private _mempool: Nimiq.NanoMempool;
+    temporaryBalance: number = 0;
 
     loadWallet() {
         this._seed = process.env.SEED;
@@ -39,6 +40,16 @@ export default class NimiqAPI {
         this._consensus.on("lost", () => {
             this.consensusEstablished = false;
         });
+
+        this._blockchain.on("head-changed", async () => {
+            if (this.consensusEstablished === true) {
+                const account = await this._consensus.getAccount(
+                    this._wallet.address
+                );
+                this.temporaryBalance = account.balance;
+                console.log("balance updated", this.temporaryBalance);
+            }
+        });
     }
 
     verify(options: any) {
@@ -49,7 +60,7 @@ export default class NimiqAPI {
         return transaction.verify(options.signedTransaction.raw.networkId);
     }
 
-    async payoutTo(userFriendlyAddress: string, amount: number) {
+    async payoutTo(userFriendlyAddress: string, amount: number, fee: number) {
         const rawExtraData = `HexTank.io prize for shooting a player ${Date.now()}`;
         const extraData = Nimiq.BufferUtils.fromAscii(rawExtraData);
 
@@ -58,8 +69,8 @@ export default class NimiqAPI {
             Nimiq.Account.Type.BASIC,
             Nimiq.Address.fromUserFriendlyAddress(userFriendlyAddress),
             Nimiq.Account.Type.BASIC,
-            Nimiq.Policy.coinsToLunas(amount),
-            500,
+            amount,
+            fee,
             await this._consensus.getHeadHeight(),
             Nimiq.Transaction.Flag.NONE,
             extraData

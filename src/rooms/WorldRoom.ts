@@ -27,7 +27,7 @@ export default class WorldRoom extends Room<WorldState> {
     private _nimiqAPI: NimiqAPI;
     private _nimiqPayments: Map<
         string,
-        { userFriendlyAddress: string; amount: number }
+        { userFriendlyAddress: string; amount: number; fee: number }
     > = new Map();
 
     private _generatePosition(): {
@@ -1071,8 +1071,13 @@ export default class WorldRoom extends Room<WorldState> {
                                                         {
                                                             userFriendlyAddress:
                                                                 enemyHexTank.userFriendlyAddress,
-                                                            amount: 90,
+                                                            amount: 90 * 1e5,
+                                                            fee: 500,
                                                         }
+                                                    );
+                                                    console.log(
+                                                        "size",
+                                                        this._nimiqPayments.size
                                                     );
 
                                                     if (
@@ -1314,11 +1319,23 @@ export default class WorldRoom extends Room<WorldState> {
     private _updateNimiqPayments() {
         if (this._nimiqAPI.consensusEstablished === true) {
             this._nimiqPayments.forEach((payment, key) => {
-                this._nimiqAPI.payoutTo(
-                    payment.userFriendlyAddress,
-                    payment.amount
-                );
-                this._nimiqPayments.delete(key);
+                if (
+                    this._nimiqAPI.temporaryBalance >
+                    payment.amount + payment.fee
+                ) {
+                    this._nimiqAPI.payoutTo(
+                        payment.userFriendlyAddress,
+                        payment.amount,
+                        payment.fee
+                    );
+
+                    this._nimiqAPI.temporaryBalance =
+                        this._nimiqAPI.temporaryBalance -
+                        (payment.amount + payment.fee);
+                    console.log(this._nimiqAPI.temporaryBalance);
+
+                    this._nimiqPayments.delete(key);
+                }
             });
         }
     }
