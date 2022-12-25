@@ -47,7 +47,7 @@ export default class NimiqAPI {
                     this._wallet.address
                 );
                 this.temporaryBalance = account.balance;
-                console.log("balance updated", this.temporaryBalance);
+                console.log("Balance update", this.temporaryBalance);
             }
         });
     }
@@ -60,8 +60,13 @@ export default class NimiqAPI {
         return transaction.verify(options.signedTransaction.raw.networkId);
     }
 
-    async payoutTo(userFriendlyAddress: string, amount: number, fee: number) {
-        const rawExtraData = `HexTank.io prize for shooting a player ${Date.now()}`;
+    async payoutTo(
+        userFriendlyAddress: string,
+        amount: number,
+        fee: number,
+        message: string
+    ) {
+        const rawExtraData = `HexTank.io Prize ${message}`;
         const extraData = Nimiq.BufferUtils.fromAscii(rawExtraData);
 
         const transaction = new Nimiq.ExtendedTransaction(

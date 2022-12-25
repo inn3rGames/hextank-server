@@ -820,8 +820,25 @@ export default class WorldRoom extends Room<WorldState> {
         console.log(`WorldRoom ${this.roomId} created.`);
     }
 
+    private _isNotPresent(userFriendlyAddress: string) {
+        let presenceCount = 0;
+        this.state.hexTanks.forEach((currentHexTank) => {
+            if (userFriendlyAddress === currentHexTank.userFriendlyAddress) {
+                presenceCount += 1;
+            }
+        });
+        if (presenceCount === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     onAuth(client: Client, options: any) {
-        return this._nimiqAPI.verify(options);
+        return (
+            this._nimiqAPI.verify(options) &&
+            this._isNotPresent(options.signedTransaction.raw.sender)
+        );
     }
 
     onJoin(client: Client, options: any) {
@@ -1076,7 +1093,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                         }
                                                     );
                                                     console.log(
-                                                        "size",
+                                                        "Payment batch size",
                                                         this._nimiqPayments.size
                                                     );
 
@@ -1326,13 +1343,17 @@ export default class WorldRoom extends Room<WorldState> {
                     this._nimiqAPI.payoutTo(
                         payment.userFriendlyAddress,
                         payment.amount,
-                        payment.fee
+                        payment.fee,
+                        key
                     );
 
                     this._nimiqAPI.temporaryBalance =
                         this._nimiqAPI.temporaryBalance -
                         (payment.amount + payment.fee);
-                    console.log(this._nimiqAPI.temporaryBalance);
+                    console.log(
+                        "Temporary balance update",
+                        this._nimiqAPI.temporaryBalance
+                    );
 
                     this._nimiqPayments.delete(key);
                 }
