@@ -25,7 +25,10 @@ export default class WorldRoom extends Room<WorldState> {
     > = new Map();
 
     private _nimiqAPI: NimiqAPI;
-    private _nimiqTransactions: Map<string, any> = new Map();
+    private _nimiqPayments: Map<
+        string,
+        { userFriendlyAddress: string; amount: number }
+    > = new Map();
 
     private _generatePosition(): {
         x: number;
@@ -1059,9 +1062,17 @@ export default class WorldRoom extends Room<WorldState> {
                                                         `${enemyHexTank.id} ${enemyHexTank.name} ${enemyHexTank.userFriendlyAddress} shot ${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress}!`
                                                     );
 
-                                                    this._nimiqAPI.payoutTo(
-                                                        enemyHexTank.userFriendlyAddress,
-                                                        90
+                                                    this._nimiqPayments.set(
+                                                        enemyHexTank.id +
+                                                            currentHexTank.id +
+                                                            performance
+                                                                .now()
+                                                                .toString(),
+                                                        {
+                                                            userFriendlyAddress:
+                                                                enemyHexTank.userFriendlyAddress,
+                                                            amount: 90,
+                                                        }
                                                     );
 
                                                     if (
@@ -1300,9 +1311,22 @@ export default class WorldRoom extends Room<WorldState> {
         });
     }
 
+    private _updateNimiqPayments() {
+        if (this._nimiqAPI.consensusEstablished === true) {
+            this._nimiqPayments.forEach((payment, key) => {
+                this._nimiqAPI.payoutTo(
+                    payment.userFriendlyAddress,
+                    payment.amount
+                );
+                this._nimiqPayments.delete(key);
+            });
+        }
+    }
+
     private _fixedUpdate() {
         this._updateEntities();
         this._checkCollisions();
+        this._updateNimiqPayments();
         this._spatialHash.clear();
     }
 
