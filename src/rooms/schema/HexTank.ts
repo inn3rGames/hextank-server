@@ -170,7 +170,7 @@ export default class HexTank extends Schema {
                             this.z - 0.95 * -Math.sin(this.angle),
                             0.1,
                             this.angle,
-                            "bullet" + uuidv1(),
+                            "b-" + uuidv1(),
                             this.id,
                             this.invincibility,
                             this._bulletsMap

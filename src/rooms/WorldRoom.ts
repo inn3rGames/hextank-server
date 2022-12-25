@@ -1055,7 +1055,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                 currentHexTank,
                                                 circleEntity,
                                                 true
-                                            )
+                                            ) === true
                                         ) {
                                             const enemyHexTank =
                                                 this.state.hexTanks.get(
@@ -1113,7 +1113,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                                 z: currentHexTank.z,
                                                                 angle: currentHexTank.angle,
                                                                 id:
-                                                                    "hexTankExplosion" +
+                                                                    "hte-" +
                                                                     uuidv1(),
                                                             }
                                                         );
@@ -1135,9 +1135,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                         x: currentBullet.x,
                                                         z: currentBullet.z,
                                                         angle: currentBullet.angle,
-                                                        id:
-                                                            "bulletExplosion" +
-                                                            uuidv1(),
+                                                        id: "be-" + uuidv1(),
                                                     }
                                                 );
                                             }
@@ -1160,7 +1158,7 @@ export default class WorldRoom extends Room<WorldState> {
                                             this._circleCircleCollision(
                                                 currentHexTank,
                                                 circleEntity
-                                            )
+                                            ) === true
                                         ) {
                                             currentHexTank.collisionBody.collided =
                                                 true;
@@ -1177,7 +1175,7 @@ export default class WorldRoom extends Room<WorldState> {
                                         this._circleCircleCollision(
                                             currentHexTank,
                                             circleEntity
-                                        )
+                                        ) === true
                                     ) {
                                         currentHexTank.collisionBody.collided =
                                             true;
@@ -1197,7 +1195,7 @@ export default class WorldRoom extends Room<WorldState> {
                                     this._circleRectangleCollision(
                                         currentHexTank,
                                         rectangleEntity
-                                    )
+                                    ) === true
                                 ) {
                                     currentHexTank.collisionBody.collided =
                                         true;
@@ -1239,7 +1237,7 @@ export default class WorldRoom extends Room<WorldState> {
                                             currentBullet,
                                             circleEntity,
                                             true
-                                        )
+                                        ) === true
                                     ) {
                                         if (
                                             currentBullet.invincibility ===
@@ -1263,7 +1261,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                             z: currentBullet.z,
                                                             angle: currentBullet.angle,
                                                             id:
-                                                                "bulletExplosion" +
+                                                                "be-" +
                                                                 uuidv1(),
                                                         }
                                                     );
@@ -1275,9 +1273,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                         x: currentBullet.x,
                                                         z: currentBullet.z,
                                                         angle: currentBullet.angle,
-                                                        id:
-                                                            "bulletExplosion" +
-                                                            uuidv1(),
+                                                        id: "be-" + uuidv1(),
                                                     }
                                                 );
                                             }
@@ -1300,14 +1296,14 @@ export default class WorldRoom extends Room<WorldState> {
                                         currentBullet,
                                         rectangleEntity,
                                         true
-                                    )
+                                    ) === true
                                 ) {
                                     if (currentBullet.invincibility === false) {
                                         this.broadcast("bulletExplosion", {
                                             x: currentBullet.x,
                                             z: currentBullet.z,
                                             angle: currentBullet.angle,
-                                            id: "bulletExplosion" + uuidv1(),
+                                            id: "be-" + uuidv1(),
                                         });
                                     }
                                     this.state.bullets.delete(currentBullet.id);
