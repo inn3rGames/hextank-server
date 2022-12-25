@@ -5,6 +5,7 @@ import StaticCircleEntity from "./schema/StaticCircleEntity";
 import StaticRectangleEntity from "./schema/StaticRectangleEntity";
 import Bullet from "./schema/Bullet";
 import NimiqAPI from "../NimiqAPI";
+import { v1 as uuidv1 } from "uuid";
 
 export default class WorldRoom extends Room<WorldState> {
     maxClients: number = 25;
@@ -1080,11 +1081,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                     );
 
                                                     this._nimiqPayments.set(
-                                                        enemyHexTank.id +
-                                                            currentHexTank.id +
-                                                            performance
-                                                                .now()
-                                                                .toString(),
+                                                        "tx-" + uuidv1(),
                                                         {
                                                             userFriendlyAddress:
                                                                 enemyHexTank.userFriendlyAddress,
@@ -1117,9 +1114,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                                 angle: currentHexTank.angle,
                                                                 id:
                                                                     "hexTankExplosion" +
-                                                                    performance
-                                                                        .now()
-                                                                        .toString(),
+                                                                    uuidv1(),
                                                             }
                                                         );
                                                     }
@@ -1142,9 +1137,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                         angle: currentBullet.angle,
                                                         id:
                                                             "bulletExplosion" +
-                                                            performance
-                                                                .now()
-                                                                .toString(),
+                                                            uuidv1(),
                                                     }
                                                 );
                                             }
@@ -1271,9 +1264,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                             angle: currentBullet.angle,
                                                             id:
                                                                 "bulletExplosion" +
-                                                                performance
-                                                                    .now()
-                                                                    .toString(),
+                                                                uuidv1(),
                                                         }
                                                     );
                                                 }
@@ -1286,9 +1277,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                         angle: currentBullet.angle,
                                                         id:
                                                             "bulletExplosion" +
-                                                            performance
-                                                                .now()
-                                                                .toString(),
+                                                            uuidv1(),
                                                     }
                                                 );
                                             }
@@ -1318,9 +1307,7 @@ export default class WorldRoom extends Room<WorldState> {
                                             x: currentBullet.x,
                                             z: currentBullet.z,
                                             angle: currentBullet.angle,
-                                            id:
-                                                "bulletExplosion" +
-                                                performance.now().toString(),
+                                            id: "bulletExplosion" + uuidv1(),
                                         });
                                     }
                                     this.state.bullets.delete(currentBullet.id);

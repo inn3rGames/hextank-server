@@ -1,6 +1,7 @@
 import { MapSchema, Schema, type } from "@colyseus/schema";
 import CircleBody from "./CircleBody";
 import Bullet from "./Bullet";
+import { v1 as uuidv1 } from "uuid";
 
 export default class HexTank extends Schema {
     @type("number") x: number;
@@ -169,7 +170,7 @@ export default class HexTank extends Schema {
                             this.z - 0.95 * -Math.sin(this.angle),
                             0.1,
                             this.angle,
-                            this.id + performance.now().toString(),
+                            "bullet" + uuidv1(),
                             this.id,
                             this.invincibility,
                             this._bulletsMap
