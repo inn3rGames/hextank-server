@@ -9,7 +9,7 @@ export default class NimiqAPI {
 
     private _networkType: string;
 
-    private _configBuilder: Nimiq.Client.ConfigurationBuilder;
+    private _clientConfiguration: Nimiq.Client.Configuration;
     private _client: Nimiq.Client;
 
     consensusEstablished: boolean = false;
@@ -39,8 +39,13 @@ export default class NimiqAPI {
             Nimiq.GenesisConfig.test();
         }
 
-        this._configBuilder = Nimiq.Client.Configuration.builder();
-        this._client = this._configBuilder.instantiateClient();
+        this._clientConfiguration = new Nimiq.Client.Configuration(
+            Nimiq.NetworkConfig.getDefault(),
+            [Nimiq.Client.Feature.MEMPOOL],
+            false,
+            10
+        );
+        this._client = new Nimiq.Client(this._clientConfiguration);
 
         this._client.addConsensusChangedListener((consensus) => {
             if (consensus === Nimiq.Client.ConsensusState.ESTABLISHED) {

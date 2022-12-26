@@ -129,3 +129,7 @@ dist
 
 # Nimiq generated folder
 peer-key/
+main-light-consensus/
+main-full-consensus/
+test-light-consensus/
+test-full-consensus/
