@@ -13,4 +13,8 @@ describe("Testing Nimiq logic", () => {
             true
         );
     });
+
+    it("Test network set properly", () => {
+        assert.strictEqual("TEST" === process.env.NIMIQ_NETWORK_TYPE, true);
+    });
 });

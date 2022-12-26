@@ -7,6 +7,8 @@ export default class NimiqAPI {
     private _keyPair: Nimiq.KeyPair;
     private _wallet: Nimiq.Wallet;
 
+    private _networkType: string;
+
     private _configBuilder: Nimiq.Client.ConfigurationBuilder;
     private _client: Nimiq.Client;
 
@@ -29,7 +31,13 @@ export default class NimiqAPI {
     }
 
     async connect() {
-        Nimiq.GenesisConfig.test();
+        this._networkType = process.env.NIMIQ_NETWORK_TYPE;
+        if (this._networkType === "MAIN") {
+            Nimiq.GenesisConfig.main();
+        }
+        if (this._networkType === "TEST") {
+            Nimiq.GenesisConfig.test();
+        }
 
         this._configBuilder = Nimiq.Client.Configuration.builder();
         this._client = this._configBuilder.instantiateClient();
