@@ -21,8 +21,8 @@ export default Arena({
             res.send("HexTank Server ready!");
         });
 
-        const name = process.env.NAME;
-        const pass = process.env.PASS;
+        const name = process.env.PANEL_NAME;
+        const pass = process.env.PANEL_PASS;
         const users: { [key: string]: string } = {};
         users[name] = pass;
         const basicAuthMiddleware = basicAuth({

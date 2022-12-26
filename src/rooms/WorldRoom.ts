@@ -4,6 +4,7 @@ import HexTank from "./schema/HexTank";
 import StaticCircleEntity from "./schema/StaticCircleEntity";
 import StaticRectangleEntity from "./schema/StaticRectangleEntity";
 import Bullet from "./schema/Bullet";
+import Nimiq from "@nimiq/core";
 import NimiqAPI from "../NimiqAPI";
 import { v1 as uuidv1 } from "uuid";
 
@@ -835,9 +836,10 @@ export default class WorldRoom extends Room<WorldState> {
         }
     }
 
-    onAuth(client: Client, options: any) {
+    async onAuth(client: Client, options: any) {
         return (
-            this._nimiqAPI.verify(options) &&
+            this._nimiqAPI.verifyTransactionIntegrity(options) &&
+            (await this._nimiqAPI.verifyTransactionState(options)) &&
             this._isNotPresent(options.signedTransaction.raw.sender)
         );
     }
@@ -1085,8 +1087,14 @@ export default class WorldRoom extends Room<WorldState> {
                                                         {
                                                             userFriendlyAddress:
                                                                 enemyHexTank.userFriendlyAddress,
-                                                            amount: 90 * 1e5,
-                                                            fee: 500,
+                                                            amount: parseFloat(
+                                                                process.env
+                                                                    .NIMIQ_LUNA_PRIZE
+                                                            ),
+                                                            fee: parseFloat(
+                                                                process.env
+                                                                    .NIMIQ_LUNA_TRANSACTION_FEE
+                                                            ),
                                                         }
                                                     );
                                                     console.log(

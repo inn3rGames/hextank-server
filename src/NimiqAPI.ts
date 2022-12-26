@@ -7,16 +7,15 @@ export default class NimiqAPI {
     private _keyPair: Nimiq.KeyPair;
     private _wallet: Nimiq.Wallet;
 
-    private _consensus: Nimiq.NanoConsensus;
-    consensusEstablished: boolean = false;
-    private _network: Nimiq.Network;
+    private _configBuilder: Nimiq.Client.ConfigurationBuilder;
+    private _client: Nimiq.Client;
 
-    private _blockchain: Nimiq.NanoChain;
+    consensusEstablished: boolean = false;
     temporaryBalance: number = 0;
     private _lastBalance: number = 0;
 
     loadWallet() {
-        this._seed = process.env.SEED;
+        this._seed = process.env.NIMIQ_HOT_SEED;
         this._extendedPrivateKey =
             Nimiq.MnemonicUtils.mnemonicToExtendedPrivateKey(this._seed);
         this._privateKey =
@@ -28,21 +27,24 @@ export default class NimiqAPI {
     async connect() {
         Nimiq.GenesisConfig.test();
 
-        this._consensus = await Nimiq.Consensus.nano();
-        this._blockchain = this._consensus.blockchain;
-        this._network = this._consensus.network;
-        this._network.connect();
+        this._configBuilder = Nimiq.Client.Configuration.builder();
+        this._client = this._configBuilder.instantiateClient();
 
-        this._consensus.on("established", () => {
-            this.consensusEstablished = true;
-        });
-        this._consensus.on("lost", () => {
-            this.consensusEstablished = false;
+        this._client.addConsensusChangedListener((consensus) => {
+            if (consensus === Nimiq.Client.ConsensusState.ESTABLISHED) {
+                this.consensusEstablished = true;
+            }
+            if (consensus === Nimiq.Client.ConsensusState.SYNCING) {
+                this.consensusEstablished = false;
+            }
+            if (consensus === Nimiq.Client.ConsensusState.CONNECTING) {
+                this.consensusEstablished = false;
+            }
         });
 
-        this._blockchain.on("head-changed", async () => {
+        this._client.addHeadChangedListener(async () => {
             if (this.consensusEstablished === true) {
-                const account = await this._consensus.getAccount(
+                const account = await this._client.getAccount(
                     this._wallet.address
                 );
 
@@ -55,12 +57,65 @@ export default class NimiqAPI {
         });
     }
 
-    verify(options: any) {
+    verifyTransactionIntegrity(options: any) {
         const transactionData = options.signedTransaction.serializedTx;
         const transaction = Nimiq.ExtendedTransaction.unserialize(
             Nimiq.BufferUtils.fromAny(transactionData)
         );
-        return transaction.verify(options.signedTransaction.raw.networkId);
+        const transactionIntegrity = transaction.verify(
+            options.signedTransaction.raw.networkId
+        );
+
+        let transactionAmountValid: boolean;
+        if (
+            options.signedTransaction.raw.value >=
+                process.env.NIMIQ_LUNA_ENTRY_FEE &&
+            options.signedTransaction.raw.fee >=
+                process.env.NIMIQ_LUNA_TRANSACTION_FEE
+        ) {
+            transactionAmountValid = true;
+        } else {
+            transactionAmountValid = false;
+        }
+
+        return transactionIntegrity && transactionAmountValid;
+    }
+
+    private _delay(ms: number) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    async verifyTransactionState(options: any) {
+        const transactionData = options.signedTransaction.serializedTx;
+        const transaction = Nimiq.ExtendedTransaction.unserialize(
+            Nimiq.BufferUtils.fromAny(transactionData)
+        );
+
+        let transactionDetails = await this._client.getTransaction(
+            transaction.hash()
+        );
+        let transactionState = transactionDetails.state;
+        let count = 0;
+
+        while (
+            transactionState !== Nimiq.Client.TransactionState.MINED &&
+            transactionState !== Nimiq.Client.TransactionState.CONFIRMED
+        ) {
+            await this._delay(1000);
+            count += 1;
+            transactionDetails = await this._client.getTransaction(
+                transaction.hash()
+            );
+            transactionState = transactionDetails.state;
+
+            if (count >= 300) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     async payoutTo(
@@ -69,7 +124,7 @@ export default class NimiqAPI {
         fee: number,
         message: string
     ) {
-        const rawExtraData = `HexTank.io Prize ${message}`;
+        const rawExtraData = `HexTank.io prize ${message}`;
         const extraData = Nimiq.BufferUtils.fromAscii(rawExtraData);
 
         const transaction = new Nimiq.ExtendedTransaction(
@@ -79,7 +134,7 @@ export default class NimiqAPI {
             Nimiq.Account.Type.BASIC,
             amount,
             fee,
-            await this._consensus.getHeadHeight(),
+            await this._client.getHeadHeight(),
             Nimiq.Transaction.Flag.NONE,
             extraData
         );
@@ -96,11 +151,9 @@ export default class NimiqAPI {
         );
         transaction.proof = proof.serialize();
 
-        const result = await this._consensus.sendTransaction(transaction);
-        if (result === 1) {
-            console.log(`Payment sent ${result} ${transaction.hash()}`);
-        } else {
-            console.log(`Payment failed ${result} ${transaction.hash()}`);
-        }
+        const result = await this._client.sendTransaction(transaction);
+        console.log(
+            `Payment sent ${JSON.stringify(result.state)} ${transaction.hash()}`
+        );
     }
 }

@@ -9,7 +9,7 @@ describe("Testing Nimiq logic", () => {
 
         assert.strictEqual(
             nimiqAPI["_wallet"].address.toUserFriendlyAddress() ===
-                process.env.ADDRESS,
+                process.env.NIMIQ_HOT_ADDRESS,
             true
         );
     });
