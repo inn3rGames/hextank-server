@@ -26,6 +26,10 @@ export default class WorldRoom extends Room<WorldState> {
         Array<HexTank | StaticCircleEntity | StaticRectangleEntity | Bullet>
     > = new Map();
 
+    private _nimiqPrizeAmount: number = parseInt(process.env.NIMIQ_LUNA_PRIZE);
+    private _nimiqTransactionFee: number = parseInt(
+        process.env.NIMIQ_LUNA_TRANSACTION_FEE
+    );
     private _nimiqAPI: NimiqAPI;
     private _nimiqPayments: Map<
         string,
@@ -1087,14 +1091,10 @@ export default class WorldRoom extends Room<WorldState> {
                                                         {
                                                             userFriendlyAddress:
                                                                 enemyHexTank.userFriendlyAddress,
-                                                            amount: parseFloat(
-                                                                process.env
-                                                                    .NIMIQ_LUNA_PRIZE
-                                                            ),
-                                                            fee: parseFloat(
-                                                                process.env
-                                                                    .NIMIQ_LUNA_TRANSACTION_FEE
-                                                            ),
+                                                            amount: this
+                                                                ._nimiqPrizeAmount,
+                                                            fee: this
+                                                                ._nimiqTransactionFee,
                                                         }
                                                     );
                                                     console.log(
