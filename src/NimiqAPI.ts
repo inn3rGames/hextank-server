@@ -13,6 +13,10 @@ export default class NimiqAPI {
     consensusEstablished: boolean = false;
     temporaryBalance: number = 0;
     private _lastBalance: number = 0;
+    private _processingTransactions: Map<
+        string,
+        Nimiq.Client.TransactionState
+    > = new Map();
 
     loadWallet() {
         this._seed = process.env.NIMIQ_HOT_SEED;
@@ -55,6 +59,28 @@ export default class NimiqAPI {
                 }
             }
         });
+
+        this._client.addTransactionListener(
+            (transactionDetails) => {
+                this._processingTransactions.set(
+                    transactionDetails.transactionHash.toHex(),
+                    transactionDetails.state
+                );
+
+                while (this._processingTransactions.size > 1000) {
+                    const oldTransactionKey = this._processingTransactions
+                        .entries()
+                        .next().value[0];
+                    this._processingTransactions.delete(oldTransactionKey);
+                }
+
+                console.log(
+                    "Last 1000 transactions",
+                    this._processingTransactions
+                );
+            },
+            [this._wallet.address]
+        );
     }
 
     verifyTransactionIntegrity(options: any) {
@@ -93,10 +119,10 @@ export default class NimiqAPI {
             Nimiq.BufferUtils.fromAny(transactionData)
         );
 
-        let transactionDetails = await this._client.getTransaction(
-            transaction.hash()
-        );
-        let transactionState = transactionDetails.state;
+        let transactionHash = transaction.hash().toHex();
+        let transactionState =
+            this._processingTransactions.get(transactionHash);
+
         let count = 0;
 
         while (
@@ -105,16 +131,17 @@ export default class NimiqAPI {
         ) {
             await this._delay(1000);
             count += 1;
-            transactionDetails = await this._client.getTransaction(
-                transaction.hash()
-            );
-            transactionState = transactionDetails.state;
+
+            transactionState =
+                this._processingTransactions.get(transactionHash);
 
             if (count >= 300) {
+                this._processingTransactions.delete(transactionHash);
                 return false;
             }
         }
 
+        this._processingTransactions.delete(transactionHash);
         return true;
     }
 

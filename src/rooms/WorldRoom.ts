@@ -838,9 +838,9 @@ export default class WorldRoom extends Room<WorldState> {
 
     async onAuth(client: Client, options: any) {
         return (
+            this._isNotPresent(options.signedTransaction.raw.sender) &&
             this._nimiqAPI.verifyTransactionIntegrity(options) &&
-            (await this._nimiqAPI.verifyTransactionState(options)) &&
-            this._isNotPresent(options.signedTransaction.raw.sender)
+            (await this._nimiqAPI.verifyTransactionState(options))
         );
     }
 
