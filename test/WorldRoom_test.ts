@@ -2,6 +2,7 @@ import assert from "assert";
 import WorldRoom from "../src/rooms/WorldRoom";
 import HexTank from "../src/rooms/schema/HexTank";
 import StaticRectangleEntity from "../src/rooms/schema/StaticRectangleEntity";
+import NimiqAPI from "../src/NimiqAPI";
 
 describe("Testing world room logic", () => {
     it("Limit HexTank top speed", () => {
@@ -42,6 +43,7 @@ describe("Testing world room logic", () => {
 
     it("Circle bodies should not collide", async () => {
         const room = new WorldRoom();
+        room["_nimiqAPI"] = new NimiqAPI();
         room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
@@ -85,6 +87,7 @@ describe("Testing world room logic", () => {
 
     it("Circle and rectangle bodies should not collide", () => {
         const room = new WorldRoom();
+        room["_nimiqAPI"] = new NimiqAPI();
         room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
@@ -119,6 +122,7 @@ describe("Testing world room logic", () => {
 
     it("Spatial hash should find collision", () => {
         const room = new WorldRoom();
+        room["_nimiqAPI"] = new NimiqAPI();
         room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
@@ -138,6 +142,7 @@ describe("Testing world room logic", () => {
 
     it("Spatial hash should not find collision", () => {
         const room = new WorldRoom();
+        room["_nimiqAPI"] = new NimiqAPI();
         room["_fillState"]();
         room.state.staticCircleEntities.clear();
         room.state.staticRectangleEntities.clear();
