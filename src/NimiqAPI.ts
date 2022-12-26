@@ -126,6 +126,7 @@ export default class NimiqAPI {
         let count = 0;
 
         while (
+            transactionState !== Nimiq.Client.TransactionState.PENDING &&
             transactionState !== Nimiq.Client.TransactionState.MINED &&
             transactionState !== Nimiq.Client.TransactionState.CONFIRMED
         ) {
@@ -136,6 +137,15 @@ export default class NimiqAPI {
                 this._processingTransactions.get(transactionHash);
 
             if (count >= 300) {
+                this._processingTransactions.delete(transactionHash);
+                return false;
+            }
+
+            if (
+                transactionState ===
+                    Nimiq.Client.TransactionState.INVALIDATED ||
+                transactionState === Nimiq.Client.TransactionState.EXPIRED
+            ) {
                 this._processingTransactions.delete(transactionHash);
                 return false;
             }
@@ -180,7 +190,9 @@ export default class NimiqAPI {
 
         const result = await this._client.sendTransaction(transaction);
         console.log(
-            `Payment sent ${JSON.stringify(result.state)} ${transaction.hash().toHex()}`
+            `Payment sent ${JSON.stringify(result.state)} ${transaction
+                .hash()
+                .toHex()}`
         );
     }
 }

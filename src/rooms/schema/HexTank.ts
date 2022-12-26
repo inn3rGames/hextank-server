@@ -267,7 +267,7 @@ export default class HexTank extends Schema {
     private _updateInvincibility() {
         if (this.invincibility === true) {
             this._invincibilityCounter += 1;
-            if (this._invincibilityCounter >= 1800) {
+            if (this._invincibilityCounter >= 600) {
                 this.invincibility = false;
             }
         }
