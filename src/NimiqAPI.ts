@@ -75,7 +75,7 @@ export default class NimiqAPI {
                 }
 
                 console.log(
-                    "Last 1000 transactions",
+                    "Latest 1000 transactions",
                     this._processingTransactions
                 );
             },
@@ -180,7 +180,7 @@ export default class NimiqAPI {
 
         const result = await this._client.sendTransaction(transaction);
         console.log(
-            `Payment sent ${JSON.stringify(result.state)} ${transaction.hash()}`
+            `Payment sent ${JSON.stringify(result.state)} ${transaction.hash().toHex()}`
         );
     }
 }
