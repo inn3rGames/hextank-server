@@ -17,7 +17,7 @@ export default class NimiqAPI {
     private _lastBalance: number = 0;
     private _processingTransactions: Map<
         string,
-        { state: Nimiq.Client.TransactionState; time: number }
+        { state: Nimiq.Client.TransactionState; creationTime: number }
     > = new Map();
 
     loadWallet() {
@@ -77,12 +77,15 @@ export default class NimiqAPI {
             (transactionDetails) => {
                 this._processingTransactions.set(
                     transactionDetails.transactionHash.toHex(),
-                    { state: transactionDetails.state, time: Date.now() }
+                    {
+                        state: transactionDetails.state,
+                        creationTime: performance.now(),
+                    }
                 );
 
-                const time = Date.now();
+                const currentTime = performance.now();
                 this._processingTransactions.forEach((transaction, key) => {
-                    if (time - transaction.time >= 300 * 1000) {
+                    if (currentTime - transaction.creationTime >= 300 * 1000) {
                         console.log(`Old transaction deleted ${key}`);
                         this._processingTransactions.delete(key);
                     }
