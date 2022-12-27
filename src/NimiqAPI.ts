@@ -17,7 +17,7 @@ export default class NimiqAPI {
     private _lastBalance: number = 0;
     private _processingTransactions: Map<
         string,
-        Nimiq.Client.TransactionState
+        { state: Nimiq.Client.TransactionState; time: number }
     > = new Map();
 
     loadWallet() {
@@ -77,18 +77,19 @@ export default class NimiqAPI {
             (transactionDetails) => {
                 this._processingTransactions.set(
                     transactionDetails.transactionHash.toHex(),
-                    transactionDetails.state
+                    { state: transactionDetails.state, time: Date.now() }
                 );
 
-                while (this._processingTransactions.size > 1000) {
-                    const oldTransactionKey = this._processingTransactions
-                        .entries()
-                        .next().value[0];
-                    this._processingTransactions.delete(oldTransactionKey);
-                }
+                const time = Date.now();
+                this._processingTransactions.forEach((transaction, key) => {
+                    if (time - transaction.time >= 300 * 1000) {
+                        console.log(`Old transaction deleted ${key}`);
+                        this._processingTransactions.delete(key);
+                    }
+                });
 
                 console.log(
-                    "Latest 1000 transactions",
+                    "Latest transactions",
                     this._processingTransactions
                 );
             },
@@ -134,7 +135,7 @@ export default class NimiqAPI {
 
         let transactionHash = transaction.hash().toHex();
         let transactionState =
-            this._processingTransactions.get(transactionHash);
+            this._processingTransactions.get(transactionHash).state;
 
         let count = 0;
 
@@ -147,7 +148,7 @@ export default class NimiqAPI {
             count += 1;
 
             transactionState =
-                this._processingTransactions.get(transactionHash);
+                this._processingTransactions.get(transactionHash).state;
 
             if (count >= 300) {
                 this._processingTransactions.delete(transactionHash);
