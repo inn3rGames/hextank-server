@@ -16,6 +16,7 @@ export default class NimiqAPI {
     consensusEstablished: boolean = false;
     temporaryBalance: number = 0;
     private _lastBalance: number = 0;
+    private _pendingTransactions: Map<string, ProcessTransaction> = new Map();
     private _followTransactions: Map<string, ProcessTransaction> = new Map();
     private _processTransactions: Map<string, ProcessTransaction> = new Map();
     private _expiringTime: number = 300;
@@ -77,6 +78,13 @@ export default class NimiqAPI {
             (transactionDetails) => {
                 const transactionHash =
                     transactionDetails.transactionHash.toHex();
+
+                console.log("Settings pending transaction", transactionHash);
+                this._pendingTransactions.set(
+                    transactionHash,
+                    new ProcessTransaction(transactionDetails.state)
+                );
+
                 const followTransaction =
                     this._followTransactions.get(transactionHash);
 
@@ -86,9 +94,16 @@ export default class NimiqAPI {
                         new ProcessTransaction(transactionDetails.state)
                     );
                     console.log(
-                        "Latest transactions",
+                        "Latest processing transactions",
                         this._processTransactions
                     );
+                }
+
+                while (this._pendingTransactions.size > 1000) {
+                    const oldTransactionKey = this._pendingTransactions
+                        .entries()
+                        .next().value[0];
+                    this._pendingTransactions.delete(oldTransactionKey);
                 }
             },
             [this._wallet.address]
@@ -134,6 +149,20 @@ export default class NimiqAPI {
         let transactionHash = transaction.hash().toHex();
         let transactionState: string;
 
+        console.log("Pending transactions", this._pendingTransactions);
+        let pendingTransaction = this._pendingTransactions.get(transactionHash);
+        if (pendingTransaction instanceof ProcessTransaction === true) {
+            transactionState = pendingTransaction.state;
+            if (
+                transactionState === Nimiq.Client.TransactionState.PENDING ||
+                transactionState === Nimiq.Client.TransactionState.MINED ||
+                transactionState === Nimiq.Client.TransactionState.CONFIRMED
+            ) {
+                console.log("Auth via pending transaction");
+                return true;
+            }
+        }
+
         this._followTransactions.set(
             transactionHash,
             new ProcessTransaction(transactionState)
@@ -153,9 +182,6 @@ export default class NimiqAPI {
             transactionState !== Nimiq.Client.TransactionState.MINED &&
             transactionState !== Nimiq.Client.TransactionState.CONFIRMED
         ) {
-            await this._delay(1000);
-            count += 1;
-
             processTransaction = this._processTransactions.get(transactionHash);
             if (processTransaction instanceof ProcessTransaction === true) {
                 transactionState = processTransaction.state;
@@ -176,9 +202,14 @@ export default class NimiqAPI {
                 processTransaction.processed = true;
                 return false;
             }
+
+            count += 1;
+            await this._delay(1000);
         }
 
-        processTransaction.processed = true;
+        if (processTransaction instanceof ProcessTransaction === true) {
+            processTransaction.processed = true;
+        }
         return true;
     }
 
@@ -230,7 +261,6 @@ export default class NimiqAPI {
     clearOldTransactions() {
         this._processTransactions.forEach((transaction, key) => {
             if (transaction.processed === true) {
-                console.log(`Old transaction deleted ${key}`);
                 this._followTransactions.delete(key);
                 this._processTransactions.delete(key);
             }
