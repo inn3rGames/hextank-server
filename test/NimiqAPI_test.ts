@@ -1,5 +1,5 @@
 import assert from "assert";
-import NimiqAPI from "../src/NimiqAPI";
+import NimiqAPI from "../src/payments/NimiqAPI";
 
 describe("Testing Nimiq logic", () => {
     it("Nimiq wallet loaded properly", async () => {
