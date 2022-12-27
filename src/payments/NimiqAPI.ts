@@ -79,7 +79,6 @@ export default class NimiqAPI {
                 const transactionHash =
                     transactionDetails.transactionHash.toHex();
 
-                console.log("Setting pending transaction", transactionHash);
                 this._pendingTransactions.set(
                     transactionHash,
                     new ProcessTransaction(transactionDetails.state)
@@ -92,10 +91,6 @@ export default class NimiqAPI {
                     this._processTransactions.set(
                         transactionHash,
                         new ProcessTransaction(transactionDetails.state)
-                    );
-                    console.log(
-                        "Latest processing transactions",
-                        this._processTransactions
                     );
                 }
 
@@ -149,7 +144,6 @@ export default class NimiqAPI {
         let transactionHash = transaction.hash().toHex();
         let transactionState: string;
 
-        console.log("Pending transactions", this._pendingTransactions);
         let pendingTransaction = this._pendingTransactions.get(transactionHash);
         if (pendingTransaction instanceof ProcessTransaction === true) {
             transactionState = pendingTransaction.state;
