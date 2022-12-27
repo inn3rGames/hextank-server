@@ -1,4 +1,5 @@
 import Nimiq from "@nimiq/core";
+import ProcessingTransaction from "./ProcessingTransaction";
 
 export default class NimiqAPI {
     private _seed: string;
@@ -15,10 +16,9 @@ export default class NimiqAPI {
     consensusEstablished: boolean = false;
     temporaryBalance: number = 0;
     private _lastBalance: number = 0;
-    private _processingTransactions: Map<
-        string,
-        { state: Nimiq.Client.TransactionState; creationTime: number }
-    > = new Map();
+    private _processingTransactions: Map<string, ProcessingTransaction> =
+        new Map();
+    private _expiringTime: number = 300;
 
     loadWallet() {
         this._seed = process.env.NIMIQ_HOT_SEED;
@@ -77,19 +77,11 @@ export default class NimiqAPI {
             (transactionDetails) => {
                 this._processingTransactions.set(
                     transactionDetails.transactionHash.toHex(),
-                    {
-                        state: transactionDetails.state,
-                        creationTime: performance.now(),
-                    }
+                    new ProcessingTransaction(
+                        transactionDetails.state,
+                        performance.now()
+                    )
                 );
-
-                const currentTime = performance.now();
-                this._processingTransactions.forEach((transaction, key) => {
-                    if (currentTime - transaction.creationTime >= 300 * 1000) {
-                        console.log(`Old transaction deleted ${key}`);
-                        this._processingTransactions.delete(key);
-                    }
-                });
 
                 console.log(
                     "Latest transactions",
@@ -137,8 +129,15 @@ export default class NimiqAPI {
         );
 
         let transactionHash = transaction.hash().toHex();
-        let transactionState =
-            this._processingTransactions.get(transactionHash).state;
+        let transactionState: string;
+
+        let processingTransaction =
+            this._processingTransactions.get(transactionHash);
+        if (processingTransaction instanceof ProcessingTransaction === true) {
+            transactionState = processingTransaction.state;
+        } else {
+            transactionState = "NONE";
+        }
 
         let count = 0;
 
@@ -150,10 +149,18 @@ export default class NimiqAPI {
             await this._delay(1000);
             count += 1;
 
-            transactionState =
-                this._processingTransactions.get(transactionHash).state;
+            processingTransaction =
+                this._processingTransactions.get(transactionHash);
+            if (
+                processingTransaction instanceof ProcessingTransaction ===
+                true
+            ) {
+                transactionState = processingTransaction.state;
+            } else {
+                transactionState = "NONE";
+            }
 
-            if (count >= 300) {
+            if (count >= this._expiringTime) {
                 this._processingTransactions.delete(transactionHash);
                 return false;
             }
@@ -211,5 +218,18 @@ export default class NimiqAPI {
                 .hash()
                 .toHex()}`
         );
+    }
+
+    clearOldTransactions() {
+        const currentTime = performance.now();
+        this._processingTransactions.forEach((transaction, key) => {
+            if (
+                currentTime - transaction.creationTime >=
+                this._expiringTime * 1000
+            ) {
+                console.log(`Old transaction deleted ${key}`);
+                this._processingTransactions.delete(key);
+            }
+        });
     }
 }

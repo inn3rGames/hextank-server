@@ -2,7 +2,7 @@ import assert from "assert";
 import WorldRoom from "../src/rooms/WorldRoom";
 import HexTank from "../src/rooms/schema/HexTank";
 import StaticRectangleEntity from "../src/rooms/schema/StaticRectangleEntity";
-import NimiqAPI from "../src/NimiqAPI";
+import NimiqAPI from "../src/payments/NimiqAPI";
 
 describe("Testing world room logic", () => {
     it("Limit HexTank top speed", () => {

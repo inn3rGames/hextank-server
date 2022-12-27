@@ -5,7 +5,7 @@ import StaticCircleEntity from "./schema/StaticCircleEntity";
 import StaticRectangleEntity from "./schema/StaticRectangleEntity";
 import Bullet from "./schema/Bullet";
 import Nimiq from "@nimiq/core";
-import NimiqAPI from "../NimiqAPI";
+import NimiqAPI from "../payments/NimiqAPI";
 import { v1 as uuidv1 } from "uuid";
 
 export default class WorldRoom extends Room<WorldState> {
@@ -1349,6 +1349,8 @@ export default class WorldRoom extends Room<WorldState> {
                     this._nimiqPayments.delete(key);
                 }
             });
+
+            this._nimiqAPI.clearOldTransactions();
         }
     }
 
