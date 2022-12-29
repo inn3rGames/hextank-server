@@ -267,7 +267,7 @@ export default class NimiqAPI {
                 transactionState !== Nimiq.Client.TransactionState.MINED &&
                 transactionState !== Nimiq.Client.TransactionState.CONFIRMED
             ) {
-                console.log(`Payment sent ${count} time ${transactionHash}`);
+                console.log(`Payment sent ${count} times ${transactionHash}`);
                 client.sendTransaction(transaction).then((details) => {
                     retry(client, transaction, details, expiringTime);
                 });
