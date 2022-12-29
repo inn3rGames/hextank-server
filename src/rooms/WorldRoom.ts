@@ -1354,7 +1354,7 @@ export default class WorldRoom extends Room<WorldState> {
         if (this._nimiqAPI.consensusEstablished === true) {
             this._nimiqPayments.forEach((payment, key) => {
                 if (
-                    this._nimiqAPI.temporaryBalance >
+                    this._nimiqAPI.temporaryBalance >=
                     payment.amount + payment.fee
                 ) {
                     this._nimiqAPI.payoutTo(
