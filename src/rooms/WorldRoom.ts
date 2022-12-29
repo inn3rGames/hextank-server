@@ -921,6 +921,7 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     onDispose() {
+        this._updateNimiqPayments();
         console.log(`WorldRoom ${this.roomId} disposed.`);
     }
 
