@@ -31,7 +31,7 @@ export default class NimiqAPI {
         this._wallet = new Nimiq.Wallet(this._keyPair);
     }
 
-    async connect() {
+    connect() {
         this._networkType = process.env.NIMIQ_NETWORK_TYPE;
         if (this._networkType === "MAIN") {
             Nimiq.GenesisConfig.main();
@@ -216,40 +216,73 @@ export default class NimiqAPI {
         const rawExtraData = `HexTank.io prize ${message}`;
         const extraData = Nimiq.BufferUtils.fromAscii(rawExtraData);
 
-        const transaction = new Nimiq.ExtendedTransaction(
-            this._wallet.address,
-            Nimiq.Account.Type.BASIC,
-            Nimiq.Address.fromUserFriendlyAddress(userFriendlyAddress),
-            Nimiq.Account.Type.BASIC,
-            amount,
-            fee,
-            await this._client.getHeadHeight(),
-            Nimiq.Transaction.Flag.NONE,
-            extraData
-        );
+        this._client.getHeadHeight().then((height) => {
+            const transaction = new Nimiq.ExtendedTransaction(
+                this._wallet.address,
+                Nimiq.Account.Type.BASIC,
+                Nimiq.Address.fromUserFriendlyAddress(userFriendlyAddress),
+                Nimiq.Account.Type.BASIC,
+                amount,
+                fee,
+                height,
+                Nimiq.Transaction.Flag.NONE,
+                extraData
+            );
 
-        const signature = Nimiq.Signature.create(
-            this._keyPair.privateKey,
-            this._keyPair.publicKey,
-            transaction.serializeContent()
-        );
+            const signature = Nimiq.Signature.create(
+                this._keyPair.privateKey,
+                this._keyPair.publicKey,
+                transaction.serializeContent()
+            );
 
-        const proof = Nimiq.SignatureProof.singleSig(
-            this._keyPair.publicKey,
-            signature
-        );
-        transaction.proof = proof.serialize();
+            const proof = Nimiq.SignatureProof.singleSig(
+                this._keyPair.publicKey,
+                signature
+            );
+            transaction.proof = proof.serialize();
 
-        const result = await this._client.sendTransaction(transaction);
-        const transactionHash = transaction.hash().toHex();
-        console.log(
-            `Payment sent ${JSON.stringify(result.state)} ${transactionHash}`
-        );
+            this._sendAndRetryTransaction(transaction);
+        });
+    }
 
-        const processTransaction = new ProcessTransaction(result.state);
-        processTransaction.processed = true;
-        this._followTransactions.set(transactionHash, processTransaction);
-        this._processTransactions.set(transactionHash, processTransaction);
+    private async _sendAndRetryTransaction(
+        transaction: Nimiq.ExtendedTransaction
+    ) {
+        let count = 0;
+
+        function retry(
+            client: Nimiq.Client,
+            transaction: Nimiq.ExtendedTransaction,
+            details: Nimiq.ClientTransactionDetails,
+            expiringTime: number
+        ) {
+            count += 1;
+
+            let transactionHash = transaction.hash().toHex();
+            let transactionState = details.state;
+
+            if (
+                transactionState !== Nimiq.Client.TransactionState.PENDING &&
+                transactionState !== Nimiq.Client.TransactionState.MINED &&
+                transactionState !== Nimiq.Client.TransactionState.CONFIRMED
+            ) {
+                console.log(`Payment sent ${count} time ${transactionHash}`);
+                client.sendTransaction(transaction).then((details) => {
+                    retry(client, transaction, details, expiringTime);
+                });
+
+                if (count >= expiringTime) {
+                    return;
+                }
+            } else {
+                console.log(`Payment sent first time ${transactionHash}`);
+                return;
+            }
+        }
+
+        this._client.sendTransaction(transaction).then((details) => {
+            retry(this._client, transaction, details, this._expiringTime);
+        });
     }
 
     clearOldTransactions() {

@@ -798,7 +798,7 @@ export default class WorldRoom extends Room<WorldState> {
     async onCreate(options: any) {
         this._nimiqAPI = new NimiqAPI();
         this._nimiqAPI.loadWallet();
-        await this._nimiqAPI.connect();
+        this._nimiqAPI.connect();
 
         this._fillState();
 
