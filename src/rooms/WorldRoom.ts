@@ -30,10 +30,19 @@ export default class WorldRoom extends Room<WorldState> {
     private _nimiqTransactionFee: number = parseInt(
         process.env.NIMIQ_LUNA_TRANSACTION_FEE
     );
+    private _nimiqColdAddress: string = process.env.NIMIQ_COLD_ADDRESS;
+    private _nimiqColdGameFee: number = parseInt(
+        process.env.NIMIQ_LUNA_COLD_GAME_FEE
+    );
     private _nimiqAPI: NimiqAPI;
     private _nimiqPayments: Map<
         string,
-        { userFriendlyAddress: string; amount: number; fee: number }
+        {
+            userFriendlyAddress: string;
+            amount: number;
+            fee: number;
+            type: string;
+        }
     > = new Map();
 
     private _generatePosition(): {
@@ -849,6 +858,13 @@ export default class WorldRoom extends Room<WorldState> {
     }
 
     onJoin(client: Client, options: any) {
+        this._nimiqPayments.set("tx-" + uuidv1(), {
+            userFriendlyAddress: this._nimiqColdAddress,
+            amount: this._nimiqColdGameFee,
+            fee: this._nimiqTransactionFee,
+            type: "game fee",
+        });
+
         const currentPosition = this._generatePosition();
 
         let clientName = options.name.toString().substring(0, 16);
@@ -1095,6 +1111,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                                 ._nimiqPrizeAmount,
                                                             fee: this
                                                                 ._nimiqTransactionFee,
+                                                            type: "prize",
                                                         }
                                                     );
                                                     console.log(
@@ -1335,6 +1352,7 @@ export default class WorldRoom extends Room<WorldState> {
                         payment.userFriendlyAddress,
                         payment.amount,
                         payment.fee,
+                        payment.type,
                         key
                     );
 

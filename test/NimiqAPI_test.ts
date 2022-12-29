@@ -1,4 +1,5 @@
 import assert from "assert";
+import Nimiq from "@nimiq/core";
 import NimiqAPI from "../src/payments/NimiqAPI";
 
 describe("Testing Nimiq logic", () => {
@@ -30,5 +31,14 @@ describe("Testing Nimiq logic", () => {
         const percent = totalPrize / totalEntryFee;
 
         assert.strictEqual(percent <= 0.9, true);
+    });
+
+    it("Cold wallet game fee", () => {
+        const coldGameFee = parseInt(
+            process.env.NIMIQ_LUNA_COLD_GAME_FEE as string
+        );
+        const coldGameFeeNim = Nimiq.Policy.lunasToCoins(coldGameFee);
+
+        assert.strictEqual(coldGameFeeNim === 50, true);
     });
 });

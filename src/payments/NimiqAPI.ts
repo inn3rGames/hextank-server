@@ -211,9 +211,10 @@ export default class NimiqAPI {
         userFriendlyAddress: string,
         amount: number,
         fee: number,
-        message: string
+        type: string,
+        id: string
     ) {
-        const rawExtraData = `HexTank.io prize ${message}`;
+        const rawExtraData = `HexTank.io ${type} ${id}`;
         const extraData = Nimiq.BufferUtils.fromAscii(rawExtraData);
 
         this._client.getHeadHeight().then((height) => {
