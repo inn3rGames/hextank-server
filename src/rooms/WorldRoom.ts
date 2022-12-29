@@ -902,6 +902,15 @@ export default class WorldRoom extends Room<WorldState> {
         const currentHexTank = this.state.hexTanks.get(client.sessionId);
 
         if (typeof currentHexTank !== "undefined") {
+            this._nimiqPayments.set("tx-" + uuidv1(), {
+                userFriendlyAddress: currentHexTank.userFriendlyAddress,
+                amount:
+                    this._nimiqPrizeAmount * currentHexTank.health +
+                    this._nimiqTransactionFee * (currentHexTank.health - 1),
+                fee: this._nimiqTransactionFee,
+                type: "refund",
+            });
+
             console.log(
                 `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress} left!`
             );
