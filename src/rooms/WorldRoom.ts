@@ -887,13 +887,20 @@ export default class WorldRoom extends Room<WorldState> {
             clientName = "guest";
         }
 
+        let userFriendlyAddress: string;
+        if (this._roomType === "PAID") {
+            userFriendlyAddress = options.signedTransaction.raw.sender;
+        } else {
+            userFriendlyAddress = "NONE";
+        }
+
         const currentHexTank = new HexTank(
             currentPosition.x,
             currentPosition.z,
             currentPosition.angle,
             client.sessionId,
             clientName,
-            options.signedTransaction.raw.sender,
+            userFriendlyAddress,
             this.state.bullets
         );
 
