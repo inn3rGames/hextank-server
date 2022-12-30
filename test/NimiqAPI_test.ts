@@ -41,4 +41,9 @@ describe("Testing Nimiq logic", () => {
 
         assert.strictEqual(coldGameFeeNim === 50, true);
     });
+
+    it("Room type PAID", () => {
+        const roomType = process.env.ROOM_TYPE as string;
+        assert.strictEqual(roomType === "PAID", true);
+    });
 });
