@@ -15,8 +15,8 @@ describe("Testing Nimiq logic", () => {
         );
     });
 
-    it("Test network set properly", () => {
-        assert.strictEqual("TEST" === process.env.NIMIQ_NETWORK_TYPE, true);
+    it("Main network set properly", () => {
+        assert.strictEqual("MAIN" === process.env.NIMIQ_NETWORK_TYPE, true);
     });
 
     it("The prize per killed HexTank is maximum 90% of the entry fee", () => {
