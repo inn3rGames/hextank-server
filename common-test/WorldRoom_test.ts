@@ -5,7 +5,7 @@ import HexTank from "../src/rooms/schema/HexTank";
 import StaticRectangleEntity from "../src/rooms/schema/StaticRectangleEntity";
 import NimiqAPI from "../src/payments/NimiqAPI";
 
-describe("Testing world room logic", () => {
+export default  describe("Testing world room logic", () => {
     it("Server name is set properly", () => {
         const envName = process.env.NAME;
         const packageName = pkg.name;

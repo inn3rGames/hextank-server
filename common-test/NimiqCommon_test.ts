@@ -2,7 +2,7 @@ import assert from "assert";
 import Nimiq from "@nimiq/core";
 import NimiqAPI from "../src/payments/NimiqAPI";
 
-describe("Testing Nimiq logic", () => {
+describe("Testing common Nimiq logic", () => {
     it("Nimiq wallet loaded properly", async () => {
         const nimiqAPI = new NimiqAPI();
 
@@ -13,10 +13,6 @@ describe("Testing Nimiq logic", () => {
                 process.env.NIMIQ_HOT_ADDRESS,
             true
         );
-    });
-
-    it("Main network set properly", () => {
-        assert.strictEqual("MAIN" === process.env.NIMIQ_NETWORK_TYPE, true);
     });
 
     it("The prize per killed HexTank is maximum 90% of the entry fee", () => {
@@ -40,10 +36,5 @@ describe("Testing Nimiq logic", () => {
         const coldGameFeeNim = Nimiq.Policy.lunasToCoins(coldGameFee);
 
         assert.strictEqual(coldGameFeeNim === 50, true);
-    });
-
-    it("Room type PAID", () => {
-        const roomType = process.env.ROOM_TYPE as string;
-        assert.strictEqual(roomType === "PAID", true);
     });
 });
