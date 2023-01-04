@@ -4,6 +4,7 @@ import HexTank from "./schema/HexTank";
 import StaticCircleEntity from "./schema/StaticCircleEntity";
 import StaticRectangleEntity from "./schema/StaticRectangleEntity";
 import Bullet from "./schema/Bullet";
+import Nimiq from "@nimiq/core";
 import NimiqAPI from "../payments/NimiqAPI";
 import { v1 as uuidv1 } from "uuid";
 
@@ -1125,7 +1126,11 @@ export default class WorldRoom extends Room<WorldState> {
                                                     currentBullet.invincibility ===
                                                         false
                                                 ) {
-                                                    enemyHexTank.damage += 1;
+                                                    enemyHexTank.damage +=
+                                                        Nimiq.Policy.lunasToCoins(
+                                                            this
+                                                                ._nimiqPrizeAmount
+                                                        );
                                                     currentHexTank.health -= 1;
                                                     currentHexTank.collisionBody.collided =
                                                         true;
