@@ -8,15 +8,15 @@ export default Arena({
     getId: () => "HexTank Server",
 
     initializeGameServer: (gameServer) => {
+        const packageName = process.env.NAME;
+        const packageVersion = process.env.VERSION;
+        console.log(`${packageName} version: ${packageVersion}`);
+
         gameServer.define("world_room", WorldRoom);
         matchMaker.createRoom("world_room", {});
     },
 
     initializeExpress: (app) => {
-        const packageName = process.env.NAME;
-        const packageVersion = process.env.VERSION;
-        console.log(`${packageName} version: ${packageVersion}`);
-
         app.get("/", (req, res) => {
             res.send("HexTank Server ready!");
         });
