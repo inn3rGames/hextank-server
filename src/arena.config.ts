@@ -13,8 +13,8 @@ export default Arena({
     },
 
     initializeExpress: (app) => {
-        const packageName = process.env.npm_package_name;
-        const packageVersion = process.env.npm_package_version;
+        const packageName = process.env.NAME;
+        const packageVersion = process.env.VERSION;
         console.log(`${packageName} version: ${packageVersion}`);
 
         app.get("/", (req, res) => {

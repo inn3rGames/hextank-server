@@ -1,3 +1,4 @@
+import pkg from "../package.json";
 import assert from "assert";
 import WorldRoom from "../src/rooms/WorldRoom";
 import HexTank from "../src/rooms/schema/HexTank";
@@ -5,6 +6,20 @@ import StaticRectangleEntity from "../src/rooms/schema/StaticRectangleEntity";
 import NimiqAPI from "../src/payments/NimiqAPI";
 
 describe("Testing world room logic", () => {
+    it("Server name is set properly", () => {
+        const envName = process.env.NAME;
+        const packageName = pkg.name;
+
+        assert.strictEqual(envName === packageName, true);
+    });
+
+    it("Server version is set properly", () => {
+        const envVersion = process.env.VERSION;
+        const packageVersion = pkg.version;
+
+        assert.strictEqual(envVersion === packageVersion, true);
+    });
+
     it("Limit HexTank top speed", () => {
         const hexTank1 = new HexTank(100, 100, 0, "1", "guest");
 
