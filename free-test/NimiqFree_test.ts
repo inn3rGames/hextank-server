@@ -18,8 +18,8 @@ describe("Testing free Nimiq logic", () => {
         assert.strictEqual(roomType === "FREE", true);
     });
 
-    it("Max clients 25", () => {
+    it("Max clients 35", () => {
         const maxClients = parseInt(process.env.MAX_CLIENTS as string);
-        assert.strictEqual(maxClients === 25, true);
+        assert.strictEqual(maxClients === 35, true);
     });
 });

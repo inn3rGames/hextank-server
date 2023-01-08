@@ -26,8 +26,8 @@ describe("Testing paid Nimiq logic", () => {
         assert.strictEqual(roomType === "PAID", true);
     });
 
-    it("Max clients 100", () => {
+    it("Max clients 105", () => {
         const maxClients = parseInt(process.env.MAX_CLIENTS as string);
-        assert.strictEqual(maxClients === 100, true);
+        assert.strictEqual(maxClients === 105, true);
     });
 });
