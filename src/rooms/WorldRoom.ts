@@ -9,7 +9,7 @@ import NimiqAPI from "../payments/NimiqAPI";
 import { v1 as uuidv1 } from "uuid";
 
 export default class WorldRoom extends Room<WorldState> {
-    maxClients: number = 25;
+    maxClients: number = parseInt(process.env.MAX_CLIENTS);
     autoDispose = false;
 
     private _worldSize: number = 500;
