@@ -184,7 +184,9 @@ export default class NimiqAPI {
             }
 
             if (count >= this._expiringTime) {
-                processTransaction.processed = true;
+                if (processTransaction instanceof ProcessTransaction === true) {
+                    processTransaction.processed = true;
+                }
                 return false;
             }
 
