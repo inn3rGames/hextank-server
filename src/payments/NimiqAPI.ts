@@ -31,7 +31,7 @@ export default class NimiqAPI {
         this._wallet = new Nimiq.Wallet(this._keyPair);
     }
 
-    connect() {
+    connect(roomType: string) {
         this._networkType = process.env.NIMIQ_NETWORK_TYPE;
         if (this._networkType === "MAIN") {
             Nimiq.GenesisConfig.main();
@@ -40,12 +40,24 @@ export default class NimiqAPI {
             Nimiq.GenesisConfig.test();
         }
 
-        this._clientConfiguration = new Nimiq.Client.Configuration(
-            Nimiq.NetworkConfig.getDefault(),
-            [Nimiq.Client.Feature.MEMPOOL],
-            false,
-            10
-        );
+        if (roomType === "PAID") {
+            this._clientConfiguration = new Nimiq.Client.Configuration(
+                Nimiq.NetworkConfig.getDefault(),
+                [Nimiq.Client.Feature.MEMPOOL],
+                false,
+                10
+            );
+        }
+
+        if (roomType === "EARN") {
+            this._clientConfiguration = new Nimiq.Client.Configuration(
+                Nimiq.NetworkConfig.getDefault(),
+                [],
+                false,
+                10
+            );
+        }
+
         this._client = new Nimiq.Client(this._clientConfiguration);
 
         this._client.addConsensusChangedListener((consensus) => {
@@ -105,20 +117,20 @@ export default class NimiqAPI {
         );
     }
 
-    verifyTransactionIntegrity(options: any) {
-        const transactionData = options.signedTransaction.serializedTx;
+    verifyTransactionIntegrity(options: any): boolean {
+        const transactionData = options.signedObject.serializedTx;
         const transaction = Nimiq.ExtendedTransaction.unserialize(
             Nimiq.BufferUtils.fromAny(transactionData)
         );
         const transactionIntegrity = transaction.verify(
-            options.signedTransaction.raw.networkId
+            options.signedObject.raw.networkId
         );
 
         let transactionAmountValid: boolean;
         if (
-            options.signedTransaction.raw.value >=
+            options.signedObject.raw.value >=
                 process.env.NIMIQ_LUNA_ENTRY_FEE &&
-            options.signedTransaction.raw.fee >=
+            options.signedObject.raw.fee >=
                 process.env.NIMIQ_LUNA_TRANSACTION_FEE
         ) {
             transactionAmountValid = true;
@@ -135,8 +147,8 @@ export default class NimiqAPI {
         });
     }
 
-    async verifyTransactionState(options: any) {
-        const transactionData = options.signedTransaction.serializedTx;
+    async verifyTransactionState(options: any): Promise<boolean> {
+        const transactionData = options.signedObject.serializedTx;
         const transaction = Nimiq.ExtendedTransaction.unserialize(
             Nimiq.BufferUtils.fromAny(transactionData)
         );
@@ -207,6 +219,44 @@ export default class NimiqAPI {
             processTransaction.processed = true;
         }
         return true;
+    }
+
+    _convertToUint8Array(object: any): Uint8Array {
+        const keys = Object.keys(object);
+        let convertedArray: any = [];
+        let convertedUint8Array: Uint8Array;
+
+        keys.forEach((key) => {
+            convertedArray.push(object[key]);
+        });
+        convertedUint8Array = Uint8Array.from(convertedArray);
+
+        return convertedUint8Array;
+    }
+
+    verifySignedMessage(options: any): boolean {
+        const signature = new Nimiq.Signature(
+            this._convertToUint8Array(options.signedObject.signature)
+        );
+        const publicKey = new Nimiq.PublicKey(
+            this._convertToUint8Array(options.signedObject.signerPublicKey)
+        );
+
+        const prefix = "\x16Nimiq Signed Message:\n";
+        const message = "HexTank.io valid login: true";
+        const messageLength = message.length.toString();
+
+        const data = prefix + messageLength + message;
+        const dataBytes = Nimiq.BufferUtils.fromUtf8(data);
+        const hash = Nimiq.Hash.computeSha256(dataBytes);
+
+        const isValid = signature.verify(publicKey, hash);
+
+        if (isValid === true) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     async payoutTo(

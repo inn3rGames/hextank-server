@@ -810,7 +810,13 @@ export default class WorldRoom extends Room<WorldState> {
         if (this._roomType === "PAID") {
             this._nimiqAPI = new NimiqAPI();
             this._nimiqAPI.loadWallet();
-            this._nimiqAPI.connect();
+            this._nimiqAPI.connect(this._roomType);
+        }
+
+        if (this._roomType === "EARN") {
+            this._nimiqAPI = new NimiqAPI();
+            this._nimiqAPI.loadWallet();
+            this._nimiqAPI.connect(this._roomType);
         }
 
         this._fillState();
@@ -857,11 +863,20 @@ export default class WorldRoom extends Room<WorldState> {
     async onAuth(client: Client, options: any) {
         if (this._roomType === "PAID") {
             return (
-                this._isNotPresent(options.signedTransaction.raw.sender) &&
+                this._isNotPresent(options.signedObject.raw.sender) &&
                 this._nimiqAPI.verifyTransactionIntegrity(options) &&
                 (await this._nimiqAPI.verifyTransactionState(options))
             );
-        } else {
+        }
+
+        if (this._roomType === "EARN") {
+            return (
+                this._isNotPresent(options.signedObject.signer) &&
+                this._nimiqAPI.verifySignedMessage(options)
+            );
+        }
+
+        if (this._roomType === "FREE") {
             return true;
         }
     }
@@ -889,9 +904,16 @@ export default class WorldRoom extends Room<WorldState> {
         }
 
         let userFriendlyAddress: string;
+
         if (this._roomType === "PAID") {
-            userFriendlyAddress = options.signedTransaction.raw.sender;
-        } else {
+            userFriendlyAddress = options.signedObject.raw.sender;
+        }
+
+        if (this._roomType === "EARN") {
+            userFriendlyAddress = options.signedObject.signer;
+        }
+
+        if (this._roomType === "FREE") {
             userFriendlyAddress = "NONE";
         }
 
@@ -931,6 +953,17 @@ export default class WorldRoom extends Room<WorldState> {
                 });
             }
 
+            if (this._roomType === "EARN") {
+                this._nimiqPayments.set("tx-" + uuidv1(), {
+                    userFriendlyAddress: currentHexTank.userFriendlyAddress,
+                    amount:
+                        this._nimiqPrizeAmount * currentHexTank.health +
+                        this._nimiqTransactionFee * (currentHexTank.health - 1),
+                    fee: this._nimiqTransactionFee,
+                    type: "refund",
+                });
+            }
+
             console.log(
                 `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress} left!`
             );
@@ -944,6 +977,11 @@ export default class WorldRoom extends Room<WorldState> {
         if (this._roomType === "PAID") {
             this._updateNimiqPayments();
         }
+
+        if (this._roomType === "EARN") {
+            this._updateNimiqPayments();
+        }
+
         console.log(`WorldRoom ${this.roomId} disposed.`);
     }
 
@@ -1141,6 +1179,29 @@ export default class WorldRoom extends Room<WorldState> {
                                                     if (
                                                         this._roomType ===
                                                         "PAID"
+                                                    ) {
+                                                        this._nimiqPayments.set(
+                                                            "tx-" + uuidv1(),
+                                                            {
+                                                                userFriendlyAddress:
+                                                                    enemyHexTank.userFriendlyAddress,
+                                                                amount: this
+                                                                    ._nimiqPrizeAmount,
+                                                                fee: this
+                                                                    ._nimiqTransactionFee,
+                                                                type: "prize",
+                                                            }
+                                                        );
+                                                        console.log(
+                                                            "Payment batch size",
+                                                            this._nimiqPayments
+                                                                .size
+                                                        );
+                                                    }
+
+                                                    if (
+                                                        this._roomType ===
+                                                        "EARN"
                                                     ) {
                                                         this._nimiqPayments.set(
                                                             "tx-" + uuidv1(),
@@ -1417,9 +1478,15 @@ export default class WorldRoom extends Room<WorldState> {
     private _fixedUpdate() {
         this._updateEntities();
         this._checkCollisions();
+
         if (this._roomType === "PAID") {
             this._updateNimiqPayments();
         }
+
+        if (this._roomType === "EARN") {
+            this._updateNimiqPayments();
+        }
+
         this._spatialHash.clear();
     }
 
