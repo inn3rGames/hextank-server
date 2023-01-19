@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "hextank-server",
-    "version": "1.1.4-beta",
+    "version": "1.1.5-beta",
     "description": "HexTank Server",
     "main": "lib/index.js",
     "scripts": {

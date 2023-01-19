@@ -9,6 +9,8 @@ import NimiqAPI from "../payments/NimiqAPI";
 import { v1 as uuidv1 } from "uuid";
 
 export default class WorldRoom extends Room<WorldState> {
+    private _enviroment: string = process.env.NODE_ENV;
+
     maxClients: number = parseInt(process.env.MAX_CLIENTS);
     autoDispose = false;
 
@@ -834,7 +836,9 @@ export default class WorldRoom extends Room<WorldState> {
                     currentHexTank.commands.push(command);
                 }
             } else {
-                console.log("HexTank not found!");
+                if (this._enviroment === "development") {
+                    console.log("HexTank not found!");
+                }
             }
         });
 
@@ -967,7 +971,9 @@ export default class WorldRoom extends Room<WorldState> {
             );
             this.state.hexTanks.delete(client.sessionId);
         } else {
-            console.log("Already left!");
+            if (this._enviroment === "development") {
+                console.log("Already left!");
+            }
         }
     }
 
@@ -1246,7 +1252,14 @@ export default class WorldRoom extends Room<WorldState> {
                                                     }
                                                 }
                                             } else {
-                                                console.log("Enemy not found!");
+                                                if (
+                                                    this._enviroment ===
+                                                    "development"
+                                                ) {
+                                                    console.log(
+                                                        "Enemy not found!"
+                                                    );
+                                                }
                                             }
 
                                             if (
