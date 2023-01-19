@@ -319,14 +319,16 @@ export default class NimiqAPI {
                 transactionState !== Nimiq.Client.TransactionState.MINED &&
                 transactionState !== Nimiq.Client.TransactionState.CONFIRMED
             ) {
-                console.log(`Payment sent ${count} times ${transactionHash}`);
-                client.sendTransaction(transaction).then((details) => {
-                    retry(client, transaction, details, expiringTime);
-                });
-
                 if (count >= expiringTime) {
                     return;
                 }
+
+                console.log(
+                    `Payment sent again ${count} time(s) ${transactionHash}`
+                );
+                client.sendTransaction(transaction).then((details) => {
+                    retry(client, transaction, details, expiringTime);
+                });
             } else {
                 console.log(`Payment sent first time ${transactionHash}`);
                 return;
