@@ -956,9 +956,7 @@ export default class WorldRoom extends Room<WorldState> {
             if (this._roomType === "EARN") {
                 this._nimiqPayments.set("tx-" + uuidv1(), {
                     userFriendlyAddress: currentHexTank.userFriendlyAddress,
-                    amount:
-                        this._nimiqPrizeAmount * currentHexTank.health +
-                        this._nimiqTransactionFee * (currentHexTank.health - 1),
+                    amount: this._nimiqPrizeAmount * currentHexTank.health,
                     fee: this._nimiqTransactionFee,
                     type: "refund",
                 });
