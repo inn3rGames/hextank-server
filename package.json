@@ -1,16 +1,18 @@
 {
     "private": true,
     "name": "hextank-server",
-    "version": "1.1.0-beta",
+    "version": "1.1.1-beta",
     "description": "HexTank Server",
     "main": "lib/index.js",
     "scripts": {
         "start": "ts-node-dev --respawn --transpile-only src/index.ts",
         "loadtest": "colyseus-loadtest loadtest/example.ts --room my_room --numClients 2",
         "paid": "npm run paid-test && npm run clean && tsc && node node_modules/copyfiles/copyfiles package.json ./lib && node node_modules/copyfiles/copyfiles -f ./production-env-files/paid/arena.env ./lib && node node_modules/copyfiles/copyfiles ecosystem.config.js ./lib",
+        "earn": "npm run earn-test && npm run clean && tsc && node node_modules/copyfiles/copyfiles package.json ./lib && node node_modules/copyfiles/copyfiles -f ./production-env-files/earn/arena.env ./lib && node node_modules/copyfiles/copyfiles ecosystem.config.js ./lib",
         "free": "npm run free-test && npm run clean && tsc && node node_modules/copyfiles/copyfiles package.json ./lib && node node_modules/copyfiles/copyfiles -f ./production-env-files/free/arena.env ./lib && node node_modules/copyfiles/copyfiles ecosystem.config.js ./lib",
         "clean": "node node_modules/rimraf/bin lib",
         "paid-test": "env-cmd -f ./production-env-files/paid/arena.env mocha --require ts-node/register paid-test/**_test.ts --exit --timeout 15000",
+        "earn-test": "env-cmd -f ./production-env-files/earn/arena.env mocha --require ts-node/register earn-test/**_test.ts --exit --timeout 15000",
         "free-test": "env-cmd -f ./production-env-files/free/arena.env mocha --require ts-node/register free-test/**_test.ts --exit --timeout 15000"
     },
     "repository": {
