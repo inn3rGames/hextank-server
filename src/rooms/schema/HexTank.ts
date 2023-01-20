@@ -254,6 +254,16 @@ export default class HexTank extends Schema {
         this._setNewPosition();
     }
 
+    deleteBullets() {
+        if (typeof this._bulletsMap !== undefined) {
+            this._bulletsMap.forEach((bullet) => {
+                if (bullet.parentId === this.id) {
+                    this._bulletsMap.delete(bullet.id);
+                }
+            });
+        }
+    }
+
     private _updateShooting() {
         if (this._shouldShoot === false) {
             this._shootCounter += 1;

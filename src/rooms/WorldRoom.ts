@@ -966,10 +966,12 @@ export default class WorldRoom extends Room<WorldState> {
                 });
             }
 
+            currentHexTank.deleteBullets();
+            this.state.hexTanks.delete(client.sessionId);
+
             console.log(
                 `${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress} left!`
             );
-            this.state.hexTanks.delete(client.sessionId);
         } else {
             if (this._enviroment === "development") {
                 console.log("Already left!");
@@ -1108,8 +1110,14 @@ export default class WorldRoom extends Room<WorldState> {
         });
 
         this.state.bullets.forEach((bullet) => {
-            bullet.update();
-            bullet.collisionBody.setSpatialHash(this._spatialHash);
+            if (
+                typeof this.state.hexTanks.get(bullet.parentId) !== "undefined"
+            ) {
+                bullet.update();
+                bullet.collisionBody.setSpatialHash(this._spatialHash);
+            } else {
+                this.state.bullets.delete(bullet.id);
+            }
         });
     }
 
@@ -1173,9 +1181,11 @@ export default class WorldRoom extends Room<WorldState> {
                                                             this
                                                                 ._nimiqPrizeAmount
                                                         );
+
                                                     currentHexTank.health -= 1;
                                                     currentHexTank.collisionBody.collided =
                                                         true;
+
                                                     console.log(
                                                         `${enemyHexTank.id} ${enemyHexTank.name} ${enemyHexTank.userFriendlyAddress} shot ${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress}!`
                                                     );
@@ -1196,6 +1206,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                                 type: "prize",
                                                             }
                                                         );
+
                                                         console.log(
                                                             "Payment batch size",
                                                             this._nimiqPayments
@@ -1219,6 +1230,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                                 type: "prize",
                                                             }
                                                         );
+
                                                         console.log(
                                                             "Payment batch size",
                                                             this._nimiqPayments
@@ -1231,9 +1243,12 @@ export default class WorldRoom extends Room<WorldState> {
                                                         0
                                                     ) {
                                                         enemyHexTank.kills += 1;
+
+                                                        currentHexTank.deleteBullets();
                                                         this.state.hexTanks.delete(
                                                             currentHexTank.id
                                                         );
+
                                                         console.log(
                                                             `${enemyHexTank.id} ${enemyHexTank.name} ${enemyHexTank.userFriendlyAddress} killed ${currentHexTank.id} ${currentHexTank.name} ${currentHexTank.userFriendlyAddress}!`
                                                         );
@@ -1473,6 +1488,7 @@ export default class WorldRoom extends Room<WorldState> {
                     this._nimiqAPI.temporaryBalance =
                         this._nimiqAPI.temporaryBalance -
                         (payment.amount + payment.fee);
+
                     console.log(
                         "Temporary balance update",
                         this._nimiqAPI.temporaryBalance
