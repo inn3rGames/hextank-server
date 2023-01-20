@@ -1177,10 +1177,7 @@ export default class WorldRoom extends Room<WorldState> {
                                                         false
                                                 ) {
                                                     enemyHexTank.damage +=
-                                                        Nimiq.Policy.lunasToCoins(
-                                                            this
-                                                                ._nimiqPrizeAmount
-                                                        );
+                                                        this._nimiqPrizeAmount;
 
                                                     currentHexTank.health -= 1;
                                                     currentHexTank.collisionBody.collided =
