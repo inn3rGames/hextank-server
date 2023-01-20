@@ -31,7 +31,7 @@ export default class NimiqAPI {
         this._wallet = new Nimiq.Wallet(this._keyPair);
     }
 
-    connect(roomType: string) {
+    connect() {
         this._networkType = process.env.NIMIQ_NETWORK_TYPE;
         if (this._networkType === "MAIN") {
             Nimiq.GenesisConfig.main();
@@ -40,23 +40,12 @@ export default class NimiqAPI {
             Nimiq.GenesisConfig.test();
         }
 
-        if (roomType === "PAID") {
-            this._clientConfiguration = new Nimiq.Client.Configuration(
-                Nimiq.NetworkConfig.getDefault(),
-                [Nimiq.Client.Feature.MEMPOOL],
-                false,
-                10
-            );
-        }
-
-        if (roomType === "EARN") {
-            this._clientConfiguration = new Nimiq.Client.Configuration(
-                Nimiq.NetworkConfig.getDefault(),
-                [],
-                false,
-                10
-            );
-        }
+        this._clientConfiguration = new Nimiq.Client.Configuration(
+            Nimiq.NetworkConfig.getDefault(),
+            [Nimiq.Client.Feature.MEMPOOL],
+            false,
+            10
+        );
 
         this._client = new Nimiq.Client(this._clientConfiguration);
 
