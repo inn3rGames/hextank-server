@@ -38,7 +38,7 @@ describe("Testing paid Nimiq logic", () => {
         );
         const prize = parseInt(process.env.NIMIQ_LUNA_PRIZE as string);
 
-        const totalPrize = 5 * prize + 7 * transactionFee;
+        const totalPrize = 5 * prize + 6 * transactionFee;
         const totalEntryFee = entryFee + 7 * transactionFee;
         const percent = totalPrize / totalEntryFee;
 
@@ -51,6 +51,6 @@ describe("Testing paid Nimiq logic", () => {
         );
         const coldGameFeeNim = Nimiq.Policy.lunasToCoins(coldGameFee);
 
-        assert.strictEqual(coldGameFeeNim === 50, true);
+        assert.strictEqual(coldGameFeeNim === 5, true);
     });
 });
