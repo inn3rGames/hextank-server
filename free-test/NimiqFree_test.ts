@@ -45,7 +45,7 @@ describe("Testing free Nimiq logic", () => {
 
     it("Nimiq prize", () => {
         const prize = parseInt(process.env.NIMIQ_LUNA_PRIZE as string);
-        assert.strictEqual(prize === 9000000, true);
+        assert.strictEqual(prize === 900000, true);
     });
 
     it("Nimiq cold game fee empty", () => {
