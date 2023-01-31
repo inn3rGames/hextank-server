@@ -6,6 +6,7 @@ import WorldRoom from "./rooms/WorldRoom";
 
 const packageName = process.env.NAME;
 const packageVersion = process.env.VERSION;
+const roomType = process.env.ROOM_TYPE;
 
 export default Arena({
     getId: () => "HexTank Server",
@@ -19,7 +20,9 @@ export default Arena({
 
     initializeExpress: (app) => {
         app.get("/", (req, res) => {
-            res.send(`HexTank Server version: ${packageVersion} ready!`);
+            res.send(
+                `${packageName} version: ${packageVersion} room type: ${roomType} ready!`
+            );
         });
 
         const name = process.env.PANEL_NAME;
