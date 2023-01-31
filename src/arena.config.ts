@@ -4,12 +4,13 @@ import basicAuth from "express-basic-auth";
 import { matchMaker } from "colyseus";
 import WorldRoom from "./rooms/WorldRoom";
 
+const packageName = process.env.NAME;
+const packageVersion = process.env.VERSION;
+
 export default Arena({
     getId: () => "HexTank Server",
 
     initializeGameServer: (gameServer) => {
-        const packageName = process.env.NAME;
-        const packageVersion = process.env.VERSION;
         console.log(`${packageName} version: ${packageVersion}`);
 
         gameServer.define("world_room", WorldRoom);
@@ -18,7 +19,7 @@ export default Arena({
 
     initializeExpress: (app) => {
         app.get("/", (req, res) => {
-            res.send("HexTank Server ready!");
+            res.send(`HexTank Server version: ${packageVersion} ready!`);
         });
 
         const name = process.env.PANEL_NAME;
