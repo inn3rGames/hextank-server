@@ -1,4 +1,5 @@
 import Nimiq from "@nimiq/core";
+import CryptoJS from "crypto-js";
 import ProcessTransaction from "./ProcessTransaction";
 
 export default class NimiqAPI {
@@ -224,27 +225,38 @@ export default class NimiqAPI {
     }
 
     verifySignedMessage(options: any): boolean {
-        const signature = new Nimiq.Signature(
-            this._convertToUint8Array(options.signedObject.signature)
-        );
-        const publicKey = new Nimiq.PublicKey(
-            this._convertToUint8Array(options.signedObject.signerPublicKey)
-        );
+        const adMessage = options.adMessage;
+        const decryptedAdMessage = CryptoJS.AES.decrypt(
+            adMessage,
+            "DELIVERED"
+        ).toString(CryptoJS.enc.Utf8);
+        const adState = decryptedAdMessage.slice(40, decryptedAdMessage.length);
 
-        const prefix = "\x16Nimiq Signed Message:\n";
-        const message = "HexTank.io valid login: true";
-        const messageLength = message.length.toString();
-
-        const data = prefix + messageLength + message;
-        const dataBytes = Nimiq.BufferUtils.fromUtf8(data);
-        const hash = Nimiq.Hash.computeSha256(dataBytes);
-
-        const isValid = signature.verify(publicKey, hash);
-
-        if (isValid === true) {
-            return true;
-        } else {
+        if (adState !== "DELIVERED") {
             return false;
+        } else {
+            const signature = new Nimiq.Signature(
+                this._convertToUint8Array(options.signedObject.signature)
+            );
+            const publicKey = new Nimiq.PublicKey(
+                this._convertToUint8Array(options.signedObject.signerPublicKey)
+            );
+
+            const prefix = "\x16Nimiq Signed Message:\n";
+            const message = "HexTank.io earn mode entry " + adMessage;
+            const messageLength = message.length.toString();
+
+            const data = prefix + messageLength + message;
+            const dataBytes = Nimiq.BufferUtils.fromUtf8(data);
+            const hash = Nimiq.Hash.computeSha256(dataBytes);
+
+            const isValid = signature.verify(publicKey, hash);
+
+            if (isValid === true) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
