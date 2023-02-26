@@ -815,6 +815,8 @@ export default class WorldRoom extends Room<WorldState> {
             this._nimiqAPI.connect();
         }
 
+        this.setSeatReservationTime(300);
+
         this._fillState();
 
         this._createMap();
