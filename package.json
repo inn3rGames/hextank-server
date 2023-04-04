@@ -44,7 +44,7 @@
     "dependencies": {
         "@colyseus/arena": "^0.14.24",
         "@colyseus/monitor": "^0.14.22",
-        "@nimiq/core": "^1.6.0",
+        "@nimiq/core": "^1.6.1",
         "colyseus": "^0.14.24",
         "cors": "^2.8.5",
         "crypto-js": "^4.1.1",
