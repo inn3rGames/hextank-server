@@ -43,7 +43,7 @@
     },
     "dependencies": {
         "@colyseus/arena": "^0.14.24",
-        "@colyseus/monitor": "^0.14.22",
+        "@colyseus/monitor": "^0.15.0",
         "@nimiq/core": "^1.6.0",
         "colyseus": "^0.14.24",
         "cors": "^2.8.5",
